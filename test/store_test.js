@@ -30,7 +30,7 @@ describe('Store', function() {
 
     it('vivifies objects in buckets with matching models', function(done) {
       var Tag = function(attributes) {
-        this.id = attributes.id;
+        this.id   = attributes.id;
         this.name = attributes.name;
       };
 

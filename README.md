@@ -1,7 +1,7 @@
-[![Build Status](https://travis-ci.org/dscout/osteo.js.svg?branch=master)](https://travis-ci.org/dscout/osteo.js)
-[![Code Climate](https://codeclimate.com/github/dscout/osteo.js.png)](https://codeclimate.com/github/dscout/osteo.js)
+[![Build Status](https://travis-ci.org/dscout/immunid.svg?branch=master)](https://travis-ci.org/dscout/immunid)
+[![Code Climate](https://codeclimate.com/github/dscout/immunid.js/badges/gpa.svg)](https://codeclimate.com/github/dscout/immunid.js)
 
-# Osteo.js — Opinionated Data Storage
+# Immunid — Opinionated Data Storage
 
 * Robust relational data handling
 * Absolutely no view layer
@@ -14,13 +14,13 @@
 
 ## Installation
 
-Osteo is distributed with [npm](npm).
+Immunid is distributed with [npm](npm) and can be imported as CommonJS modules.
 
 ```bash
-bower install osteo.js
+bower install immunid
 ```
 
-## Retrieving Data
+### Retrieving Data
 
 All models must be created or retreived through the store. The store is what
 allows relational behavior, caching, and identity mapping. It is strictly
@@ -75,6 +75,19 @@ var Comment = Model.extend({
 });
 ```
 
+### Persisting Records
+
+Records instantiated through the store expose some simple persistence methods.
+
+```javascript
+model.save();
+model.fetch();
+model.destroy();
+```
+
+Persisting models with associations does not create, update, or destroy any of
+the associated models.
+
 ## Contributing
 
 1. Fork it
@@ -87,4 +100,4 @@ var Comment = Model.extend({
 
 Released under the MIT license. See [LICENSE](LICENSE) for details.
 
-[npm]: http://npmjs.org/osteo
+[npm]: http://npmjs.org/immunid

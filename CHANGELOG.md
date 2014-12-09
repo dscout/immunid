@@ -1,3 +1,7 @@
+## Unreleased
+
+* Rename project from osteo.js to immunid.
+
 ## v0.8.0 (2014-06-09)
 
 * Exporting with AMD, CommonJS, browser globals. This is not a breaking change,
