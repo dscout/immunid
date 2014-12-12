@@ -159,13 +159,13 @@ describe('Store', function() {
       var store = new Store();
 
       store.add('tags', { id: 100 });
-      store.delete('tags', { id: 100 });
+      store.delete({ namespace: 'tags', id: 100 });
 
       expect(store.count('tags', { sync: true })).to.eq(0);
     });
 
     it('instructs the adapter to persist deletion', function() {
-      var store = new Store(adapter);
+      var store   = new Store(adapter);
       var adapter = store.adapter;
 
       sinon.spy(adapter, 'delete');
@@ -209,9 +209,7 @@ describe('Store', function() {
 
       store.on(Store.RELOAD_EVENT, listen);
 
-      store.add('tags', { id: 100 });
-
-      store.reload('tags', { id: 100 }).then(function() {
+      store.reload({ id: 100 }).then(function() {
         expect(listen).to.be.called;
         done();
       });
@@ -225,8 +223,7 @@ describe('Store', function() {
 
       sinon.spy(adapter, 'update');
 
-      store.add('tags', { id: 100 });
-      store.save('tags', { id: 100 });
+      store.save({ id: 100 });
 
       expect(adapter.update).to.be.called;
     });
@@ -237,7 +234,7 @@ describe('Store', function() {
 
       store.on(Store.CHANGE_EVENT, listen);
 
-      store.save('tags', { id: 100 }).then(function(model) {
+      store.save({ id: 100 }).then(function(model) {
         expect(listen).to.be.called;
         done();
       });
