@@ -69,38 +69,6 @@ describe('Store', function() {
     });
   });
 
-  describe('#delete', function() {
-    it('removes the model from its bucket', function() {
-      var store = new Store();
-
-      store.add('tags', { id: 100 });
-      store.delete('tags', { id: 100 });
-
-      expect(store.count('tags', { sync: true })).to.eq(0);
-    });
-
-    it('emits a delete event', function() {
-      var store    = new Store();
-      var listener = sinon.spy();
-
-      store.on(Store.DELETE_EVENT, listener);
-      store.add('tags', { id: 100 });
-      store.delete('tags', { id: 100 });
-
-      expect(listener).to.be.called;
-    });
-
-    it('instructs the adapter to persist deletion', function() {
-      var adapter = { delete: sinon.spy() };
-      var store   = new Store(adapter);
-
-      store.add('tags', { id: 100 });
-      store.delete('tags', { id: 100 });
-
-      expect(adapter.delete).to.be.called;
-    });
-  });
-
   describe('#all', function() {
     it('retrieves all objects stored within a namespace', function(done) {
       var store = new Store();
@@ -183,6 +151,94 @@ describe('Store', function() {
         expect(counts[3]).to.eq(2);
         done();
       });
+    });
+  });
+
+  describe('#delete', function() {
+    it('removes the model from its bucket', function() {
+      var store = new Store();
+
+      store.add('tags', { id: 100 });
+      store.delete('tags', { id: 100 });
+
+      expect(store.count('tags', { sync: true })).to.eq(0);
+    });
+
+    it('emits a delete event', function() {
+      var store  = new Store();
+      var listen = sinon.spy();
+
+      store.on(Store.DELETE_EVENT, listen);
+      store.add('tags', { id: 100 });
+      store.delete('tags', { id: 100 });
+
+      expect(listen).to.be.called;
+    });
+
+    it('instructs the adapter to persist deletion', function() {
+      var store = new Store(adapter);
+      var adapter = store.adapter;
+
+      sinon.spy(adapter, 'delete');
+
+      store.add('tags', { id: 100 });
+      store.delete('tags', { id: 100 });
+
+      expect(adapter.delete).to.be.called;
+    });
+  });
+
+  describe('#reload', function() {
+    it('instructs the adapter to reload the model', function() {
+      var store   = new Store();
+      var adapter = store.adapter;
+
+      sinon.spy(adapter, 'read');
+
+      store.add('tags', { id: 100 });
+      store.reload('tags', { id: 100 });
+
+      expect(adapter.read).to.be.called;
+    });
+
+    it('emits a reload event', function() {
+      var store  = new Store();
+      var listen = sinon.spy();
+
+      store.on(Store.RELOAD_EVENT, listen);
+
+      store.add('tags', { id: 100 });
+      store.reload('tags', { id: 100 });
+
+      expect(listen).to.be.called;
+    });
+  });
+
+  describe('#save', function() {
+    it('instructs the adapter to update the model', function() {
+      var store   = new Store();
+      var adapter = store.adapter;
+
+      sinon.spy(adapter, 'update');
+
+      store.add('tags', { id: 100 });
+      store.save('tags', { id: 100 });
+
+      expect(adapter.update).to.be.called;
+    });
+
+    it('emits a change event', function() {
+      var store  = new Store();
+      var listen = sinon.spy();
+
+      store.on(Store.CHANGE_EVENT, listen);
+
+      store.add('tags', { id: 100 });
+      store.save('tags', { id: 100 });
+
+      var model = store.find('tags', 100, { sync: true });
+
+      expect(listen).to.be.calledWith(model);
     });
   });
 });
