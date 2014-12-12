@@ -46,6 +46,16 @@ describe('Store', function() {
         done();
       });
     });
+
+    it('emits an add event', function() {
+      var store  = new Store();
+      var listen = sinon.spy();
+
+      store.on(Store.ADD_EVENT, listen);
+      store.add('tags', { id: 100 });
+
+      expect(listen).to.be.called;
+    });
   });
 
   describe('#find', function() {
