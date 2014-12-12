@@ -164,17 +164,6 @@ describe('Store', function() {
       expect(store.count('tags', { sync: true })).to.eq(0);
     });
 
-    it('emits a delete event', function() {
-      var store  = new Store();
-      var listen = sinon.spy();
-
-      store.on(Store.DELETE_EVENT, listen);
-      store.add('tags', { id: 100 });
-      store.delete('tags', { id: 100 });
-
-      expect(listen).to.be.called;
-    });
-
     it('instructs the adapter to persist deletion', function() {
       var store = new Store(adapter);
       var adapter = store.adapter;
@@ -185,6 +174,19 @@ describe('Store', function() {
       store.delete('tags', { id: 100 });
 
       expect(adapter.delete).to.be.called;
+    });
+
+    it('emits a delete event', function(done) {
+      var store  = new Store();
+      var listen = sinon.spy();
+
+      store.on(Store.DELETE_EVENT, listen);
+      store.add('tags', { id: 100 });
+
+      store.delete('tags', { id: 100 }).then(function() {
+        expect(listen).to.be.called;
+        done();
+      });
     });
   });
 
@@ -201,16 +203,18 @@ describe('Store', function() {
       expect(adapter.read).to.be.called;
     });
 
-    it('emits a reload event', function() {
+    it('emits a reload event', function(done) {
       var store  = new Store();
       var listen = sinon.spy();
 
       store.on(Store.RELOAD_EVENT, listen);
 
       store.add('tags', { id: 100 });
-      store.reload('tags', { id: 100 });
 
-      expect(listen).to.be.called;
+      store.reload('tags', { id: 100 }).then(function() {
+        expect(listen).to.be.called;
+        done();
+      });
     });
   });
 
@@ -227,18 +231,16 @@ describe('Store', function() {
       expect(adapter.update).to.be.called;
     });
 
-    it('emits a change event', function() {
+    it('emits a change event', function(done) {
       var store  = new Store();
       var listen = sinon.spy();
 
       store.on(Store.CHANGE_EVENT, listen);
 
-      store.add('tags', { id: 100 });
-      store.save('tags', { id: 100 });
-
-      var model = store.find('tags', 100, { sync: true });
-
-      expect(listen).to.be.calledWith(model);
+      store.save('tags', { id: 100 }).then(function(model) {
+        expect(listen).to.be.called;
+        done();
+      });
     });
   });
 });
