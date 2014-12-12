@@ -1,5 +1,8 @@
-var expect = require('chai').expect;
-var Store  = require('../lib/Store');
+var chai      = require('chai');
+var sinon     = require('sinon');
+var sinonChai = require('sinon-chai');
+var expect    = chai.expect;
+var Store     = require('../lib/Store');
 
 describe('Store', function() {
   describe('#add', function() {
@@ -34,7 +37,7 @@ describe('Store', function() {
         this.name = attributes.name;
       };
 
-      var store = new Store({ Tag: Tag });
+      var store = new Store(null, { Tag: Tag });
       var result = store.add('tags', { id: 100, name: 'gamma' });
 
       store.find('tags', 100).then(function(tag) {
@@ -63,6 +66,38 @@ describe('Store', function() {
       var tag = store.find('tags', 100, { sync: true });
 
       expect(tag.id).to.eql(100);
+    });
+  });
+
+  describe('#delete', function() {
+    it('removes the model from its bucket', function() {
+      var store = new Store();
+
+      store.add('tags', { id: 100 });
+      store.delete('tags', { id: 100 });
+
+      expect(store.count('tags', { sync: true })).to.eq(0);
+    });
+
+    it('emits a delete event', function() {
+      var store    = new Store();
+      var listener = sinon.spy();
+
+      store.on(Store.DELETE_EVENT, listener);
+      store.add('tags', { id: 100 });
+      store.delete('tags', { id: 100 });
+
+      expect(listener).to.be.called;
+    });
+
+    it('instructs the adapter to persist deletion', function() {
+      var adapter = { delete: sinon.spy() };
+      var store   = new Store(adapter);
+
+      store.add('tags', { id: 100 });
+      store.delete('tags', { id: 100 });
+
+      expect(adapter.delete).to.be.called;
     });
   });
 
