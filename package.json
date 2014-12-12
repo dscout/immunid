@@ -1,22 +1,21 @@
 {
-  "name": "osteo",
-  "version": "0.8.0",
-  "author": "Parker Selbert",
-  "description": "Data focused framework data centric web applications",
-  "main": "osteo.js",
-  "bugs": {
-    "url": "https://github.com/dscout/osteo.js/issues"
-  },
+  "name": "immunid",
+  "version": "0.1.0",
+  "author": "dscout, inc",
+  "description": "Opinionated data storage",
+  "main": "immunid.js",
   "scripts": {
     "test": "NODE_ENV=test node_modules/karma/bin/karma start karma.conf.js --single-run",
     "lint": "jshint osteo.js lib"
   },
   "repository": {
     "type": "git",
-    "url": "dscout/osteo.js"
+    "url": "dscout/immunid"
   },
   "keywords": [
-    "osteo"
+    "immunid",
+    "data",
+    "storage"
   ],
   "license": "MIT",
   "dependencies": {},
