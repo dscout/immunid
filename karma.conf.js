@@ -4,7 +4,7 @@ module.exports = function(config) {
 
     basePath: '',
 
-    frameworks: ['mocha', 'chai-sinon', 'browserify'],
+    frameworks: ['browserify', 'mocha', 'chai-sinon'],
 
     files: [
       'test/**/*.js'
@@ -19,7 +19,6 @@ module.exports = function(config) {
     },
 
     browserify: {
-      watch: true,
       debug: true
     },
 
