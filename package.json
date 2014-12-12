@@ -5,7 +5,7 @@
   "description": "Opinionated data storage",
   "main": "immunid.js",
   "scripts": {
-    "test": "NODE_ENV=test node_modules/karma/bin/karma start karma.conf.js --single-run",
+    "test": "script/test --single-run",
     "lint": "jshint osteo.js lib"
   },
   "repository": {
