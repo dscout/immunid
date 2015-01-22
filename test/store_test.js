@@ -31,7 +31,7 @@ describe('Store', function() {
       expect(tag.store).to.eql(store);
     });
 
-    it('vivifies objects in buckets with matching models', function(done) {
+    it('vivifies objects in buckets with matching models', function() {
       var Tag = function(attributes) {
         this.id   = attributes.id;
         this.name = attributes.name;
@@ -40,10 +40,9 @@ describe('Store', function() {
       var store = new Store(null, { Tag: Tag });
       var result = store.add('tags', { id: 100, name: 'gamma' });
 
-      store.find('tags', 100).then(function(tag) {
+      return store.find('tags', 100).then(function(tag) {
         expect(tag).to.be.an.instanceOf(Tag);
         expect(tag.name).to.eq('gamma');
-        done();
       });
     });
 
@@ -59,14 +58,13 @@ describe('Store', function() {
   });
 
   describe('#find', function() {
-    it('retrieves a stored object', function(done) {
+    it('retrieves a stored object', function() {
       var store  = new Store();
       var object = { id: 100 };
       store.add('tags', object);
 
-      store.find('tags', 100).then(function(tag) {
+      return store.find('tags', 100).then(function(tag) {
         expect(tag.id).to.eq(object.id);
-        done();
       });
     });
 
@@ -80,19 +78,18 @@ describe('Store', function() {
   });
 
   describe('#all', function() {
-    it('retrieves all objects stored within a namespace', function(done) {
+    it('retrieves all objects stored within a namespace', function() {
       var store = new Store();
       store.add('tags', { id: 100 });
 
-      store.all('tags').then(function(tags) {
+      return store.all('tags').then(function(tags) {
         expect(tags).to.have.length(1);
-        done();
       });
     });
   });
 
   describe('#some', function() {
-    it('retrieves each from a list of ids', function(done) {
+    it('retrieves each from a list of ids', function() {
       var store   = new Store();
       var objectA = { id: 100 };
       var objectB = { id: 101 };
@@ -101,37 +98,34 @@ describe('Store', function() {
         .add('tags', objectA)
         .add('tags', objectB);
 
-      store.some('tags', [100, 101]).then(function(tags) {
+      return store.some('tags', [100, 101]).then(function(tags) {
         expect(tags).to.have.length(2);
-        done();
       });
     });
   });
 
   describe('#where', function() {
-    it('retrieves all objects where a condition is true', function(done) {
+    it('retrieves all objects where a condition is true', function() {
       var store = new Store();
 
       store
         .add('tags', { id: 100, name: 'alpha', group: 'greek' })
         .add('tags', { id: 101, name: 'beta',  group: 'greek' })
 
-      store.where('tags', { name: 'beta' }).then(function(tags) {
+      return store.where('tags', { name: 'beta' }).then(function(tags) {
         expect(tags).to.have.length(1);
-        done();
       });
     });
   });
 
   describe('#count', function() {
-    it('counts the number of objects within a namespace', function(done) {
+    it('counts the number of objects within a namespace', function() {
       var store = new Store();
 
       store.add('tags', { id: 100 });
 
-      store.count('tags').then(function(count) {
+      return store.count('tags').then(function(count) {
         expect(count).to.eq(1);
-        done();
       });
     });
   });
@@ -144,7 +138,7 @@ describe('Store', function() {
       posts:    [{ id: 1 }, { id: 2 }]
     }
 
-    it('extracts a payload of rooted arrays into corresponding buckets', function(done) {
+    it('extracts a payload of rooted arrays into corresponding buckets', function() {
       var store = new Store();
 
       store.parse(payload);
@@ -154,12 +148,11 @@ describe('Store', function() {
       var commentsCount = store.count('comments');
       var postsCount    = store.count('posts');
 
-      Promise.all([thingsCount, authorsCount, commentsCount, postsCount]).then(function(counts) {
+      return Promise.all([thingsCount, authorsCount, commentsCount, postsCount]).then(function(counts) {
         expect(counts[0]).to.eq(1);
         expect(counts[1]).to.eq(1);
         expect(counts[2]).to.eq(2);
         expect(counts[3]).to.eq(2);
-        done();
       });
     });
   });
@@ -186,16 +179,15 @@ describe('Store', function() {
       expect(adapter.delete).to.be.called;
     });
 
-    it('emits a delete event', function(done) {
+    it('emits a delete event', function() {
       var store  = new Store();
       var listen = sinon.spy();
 
       store.on(Store.DELETE_EVENT, listen);
       store.add('tags', { id: 100 });
 
-      store.delete('tags', { id: 100 }).then(function() {
+      return store.delete('tags', { id: 100 }).then(function() {
         expect(listen).to.be.called;
-        done();
       });
     });
   });
@@ -213,15 +205,14 @@ describe('Store', function() {
       expect(adapter.read).to.be.called;
     });
 
-    it('emits a reload event', function(done) {
+    it('emits a reload event', function() {
       var store  = new Store();
       var listen = sinon.spy();
 
       store.on(Store.RELOAD_EVENT, listen);
 
-      store.reload({ id: 100 }).then(function() {
+      return store.reload({ id: 100 }).then(function() {
         expect(listen).to.be.called;
-        done();
       });
     });
   });
@@ -238,15 +229,14 @@ describe('Store', function() {
       expect(adapter.update).to.be.called;
     });
 
-    it('emits a change event', function(done) {
+    it('emits a change event', function() {
       var store  = new Store();
       var listen = sinon.spy();
 
       store.on(Store.CHANGE_EVENT, listen);
 
-      store.save({ id: 100 }).then(function(model) {
+      return store.save({ id: 100 }).then(function(model) {
         expect(listen).to.be.called;
-        done();
       });
     });
   });
