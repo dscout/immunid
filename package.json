@@ -6,7 +6,8 @@
   "main": "immunid.js",
   "scripts": {
     "test": "script/test --single-run",
-    "lint": "jshint osteo.js lib"
+    "lint": "jshint immunid.js lib",
+    "flow": "flow check"
   },
   "repository": {
     "type": "git",
