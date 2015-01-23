@@ -3,6 +3,7 @@ var sinon     = require('sinon');
 var sinonChai = require('sinon-chai');
 var expect    = chai.expect;
 var Store     = require('../lib/Store');
+var Model     = require('../lib/Model');
 
 describe('Store', function() {
   describe('#add', function() {
@@ -17,18 +18,14 @@ describe('Store', function() {
       var store = new Store();
       store.add('tags', { id: 100 });
 
-      var tag = store.find('tags', 100, { sync: true });
-
-      expect(tag).to.have.property('get');
+      expect(store.get('tags', 100)).to.be.instanceof(Model);
     });
 
     it('injects a reference to the store into models', function() {
       var store = new Store();
       store.add('tags', { id: 100 });
 
-      var tag = store.find('tags', 100, { sync: true });
-
-      expect(tag.store).to.eql(store);
+      expect(store.get('tags', 100).store).to.eql(store);
     });
 
     it('vivifies objects in buckets with matching models', function() {

@@ -8,31 +8,48 @@ var Store     = require('../lib/Store');
 chai.use(sinonChai);
 
 describe('Store Integration', function() {
-  var server;
+  var adapter, server;
+
+  var Tag = Model.extend({
+    path: function() {
+      return this.id ? '/tags/' + this.id : '/tags';
+    }
+  });
 
   beforeEach(function() {
-    server = sinon.fakeServer.create();
+    adapter = new Adapter();
+    server  = sinon.fakeServer.create();
   });
 
   afterEach(function() {
     server.restore();
   });
 
-  it('falls back to fetching a remote object', function() {
-    var Tag = Model.extend({
-      path: function() {
-        return '/tags/' + this.id;
-      }
+  it ('fetches multiple remote objects', function() {
+    var store = new Store(adapter, { Tag: Tag });
+    var payload = { tags: [{ id: 100 }, { id: 101 }] };
+
+    server.respondWith('GET', '/tags', [
+      200, {}, JSON.stringify(payload)
+    ]);
+
+    var promise = store.find('tags').then(function(tags) {
+      expect(tags).to.have.length(2);
+      expect(tags.map(t => t.id)).to.eql([100, 101]);
     });
 
-    var adapter = new Adapter();
-    var store   = new Store(adapter, { Tag: Tag });
+    server.respond();
 
-    server.respondWith(
-      'GET',
-      '/tags/101',
-      [200, {}, JSON.stringify({ tag: { id: 101 }})]
-    )
+    return promise;
+  });
+
+  it('fetches a single remote object', function() {
+    var store = new Store(adapter, { Tag: Tag });
+    var payload = { tag: { id: 101 } };
+
+    server.respondWith('GET', '/tags/101', [
+      200, {}, JSON.stringify(payload)
+    ]);
 
     var promise = store.find('tags', 101).then(function(tag) {
       expect(tag).to.exist;
