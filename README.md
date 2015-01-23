@@ -17,7 +17,7 @@
 Immunid is distributed with [npm](npm) and can be imported as CommonJS modules.
 
 ```bash
-bower install immunid
+npm install immunid --save
 ```
 
 ### Retrieving Data
@@ -49,28 +49,19 @@ along with the parent. When that happens and you need to retrieve the associated
 data you can specify that a request should be made, along with some optional
 parameters:
 
+**WIP**
+
 ```javascript
 post.comments({ fetch: true, page: 1 }); // GET /post/1/comments?page=1
 ```
 
 The path used for a particular model or relation can be customized within the
-model itself.
+model itself. There is no `basePath` or automatic id appending.
 
 ```javascript
 var Comment = Model.extend({
-  // Defines properties on the Comment object directly
-  statics: {
-    // Class method used for class actions
-    path: function(post) {
-      return '/post/' + post.id + '/comments';
-    }
-  },
-
-  // Instance method used for instance actions. If the only modification is to
-  // append `this.id` then you can safely ommit the override, this is the
-  // default behavior.
-  path: function() {
-    return '/post/' + this.post_id + '/comments/' this.id;
+  path: function(post) {
+    return '/post/' + post.id + '/comments';
   }
 });
 ```
@@ -81,7 +72,7 @@ Records instantiated through the store expose some simple persistence methods.
 
 ```javascript
 model.save();
-model.fetch();
+model.reload();
 model.destroy();
 ```
 
