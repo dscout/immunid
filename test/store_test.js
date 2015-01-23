@@ -82,9 +82,7 @@ describe('Store', function() {
       var store = new Store();
       store.add('tags', { id: 100 });
 
-      return store.all('tags').then(function(tags) {
-        expect(tags).to.have.length(1);
-      });
+      expect(store.all('tags')).to.have.length(1);
     });
   });
 
@@ -98,9 +96,7 @@ describe('Store', function() {
         .add('tags', objectA)
         .add('tags', objectB);
 
-      return store.some('tags', [100, 101]).then(function(tags) {
-        expect(tags).to.have.length(2);
-      });
+      expect(store.some('tags', [100, 101])).to.have.length(2);
     });
   });
 
@@ -112,9 +108,7 @@ describe('Store', function() {
         .add('tags', { id: 100, name: 'alpha', group: 'greek' })
         .add('tags', { id: 101, name: 'beta',  group: 'greek' })
 
-      return store.where('tags', { name: 'beta' }).then(function(tags) {
-        expect(tags).to.have.length(1);
-      });
+      expect(store.where('tags', { name: 'beta' })).to.have.length(1);
     });
   });
 
@@ -124,9 +118,7 @@ describe('Store', function() {
 
       store.add('tags', { id: 100 });
 
-      return store.count('tags').then(function(count) {
-        expect(count).to.eq(1);
-      });
+      expect(store.count('tags')).to.eq(1);
     });
   });
 
@@ -143,17 +135,10 @@ describe('Store', function() {
 
       store.parse(payload);
 
-      var thingsCount   = store.count('things');
-      var authorsCount  = store.count('authors');
-      var commentsCount = store.count('comments');
-      var postsCount    = store.count('posts');
-
-      return Promise.all([thingsCount, authorsCount, commentsCount, postsCount]).then(function(counts) {
-        expect(counts[0]).to.eq(1);
-        expect(counts[1]).to.eq(1);
-        expect(counts[2]).to.eq(2);
-        expect(counts[3]).to.eq(2);
-      });
+      expect(store.count('things')).to.eq(1);
+      expect(store.count('authors')).to.eq(1);
+      expect(store.count('comments')).to.eq(2);
+      expect(store.count('posts')).to.eq(2);
     });
   });
 
@@ -164,7 +149,7 @@ describe('Store', function() {
       store.add('tags', { id: 100 });
       store.delete({ namespace: 'tags', id: 100 });
 
-      expect(store.count('tags', { sync: true })).to.eq(0);
+      expect(store.count('tags')).to.eq(0);
     });
 
     it('instructs the adapter to persist deletion', function() {
