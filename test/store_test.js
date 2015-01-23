@@ -64,14 +64,6 @@ describe('Store', function() {
         expect(tag.id).to.eq(object.id);
       });
     });
-
-    it('can perform synchronous retrieval', function() {
-      var store = new Store();
-      store.add('tags', { id: 100 });
-      var tag = store.find('tags', 100, { sync: true });
-
-      expect(tag.id).to.eql(100);
-    });
   });
 
   describe('#all', function() {

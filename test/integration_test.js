@@ -12,9 +12,15 @@ describe('Store Integration', function() {
 
   var Tag = Model.extend({
     path: function() {
-      return this.id ? '/tags/' + this.id : '/tags';
+      var base = this.constructor.path();
+
+      return this.id ? base + '/' + this.id : base;
     }
   });
+
+  Tag.path = function() {
+    return '/tags';
+  };
 
   beforeEach(function() {
     adapter = new Adapter();

@@ -9,6 +9,14 @@ chai.use(sinonChai);
 describe('Model', function() {
   var Foo = Model.extend({});
 
+  describe('.path', function() {
+    it('defines abstract path functions', function() {
+      expect(function() {
+        Foo.path()
+      }).to.throw(Error);
+    });
+  });
+
   describe('#initialize', function() {
     it('calls initialize immediately after construction', function() {
       sinon.spy(Foo.prototype, 'initialize');
