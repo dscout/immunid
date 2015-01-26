@@ -1,5 +1,4 @@
-[![Build Status](https://travis-ci.org/dscout/immunid.svg?branch=master)](https://travis-ci.org/dscout/immunid)
-[![Code Climate](https://codeclimate.com/github/dscout/immunid.js/badges/gpa.svg)](https://codeclimate.com/github/dscout/immunid.js)
+[![Circle CI](https://circleci.com/gh/dscout/immunid.svg?style=svg&circle-token=1cb347df46f1f0cdad20822c42fc8ccced2e97e4)](https://circleci.com/gh/dscout/immunid)
 
 # Immunid — Opinionated Data Storage
 
