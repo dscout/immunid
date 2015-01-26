@@ -48,20 +48,6 @@ describe('Model', function() {
     });
   });
 
-  describe('#isNew', function() {
-    it('is new if it lacks a primary identifier', function() {
-      var foo = new Foo();
-
-      expect(foo.isNew()).to.be.true;
-
-      foo.set({ id: undefined });
-      expect(foo.isNew()).to.be.true;
-
-      foo.set({ id: 100 });
-      expect(foo.isNew()).to.be.false;
-    });
-  });
-
   describe('#get', function() {
     it('fetches set properties', function() {
       var foo = new Foo({ name: 'alpha' });
