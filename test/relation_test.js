@@ -46,6 +46,13 @@ describe('Relation', function() {
     ]);
   });
 
+  it('returns an empty collection without any ids', function() {
+    var submission = new Submission({});
+
+    expect(submission.tags()).to.be.empty;
+    expect(submission.author()).not.to.exist;
+  });
+
   it('associates a single object through hasOne', function() {
     store.add('authors', { id: 1, name: 'John Doe' });
 
