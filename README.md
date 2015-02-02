@@ -78,6 +78,19 @@ model.destroy();
 Persisting models with associations does not create, update, or destroy any of
 the associated models.
 
+### Relating Records
+
+* There is no `belongsTo`, everything is `hasOne` currently
+* Relation names are always singular
+
+```javascript
+var Project = Model.extend({
+  account:   Relation.hasOne('account'),
+  missions:  Relation.hasMany('mission'),
+  screeners: Relation.hasMany('screener')
+});
+```
+
 ## Contributing
 
 1. Fork it
