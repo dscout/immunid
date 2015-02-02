@@ -105,9 +105,11 @@ describe('Store', function() {
     it('counts the number of objects within a namespace', function() {
       var store = new Store();
 
-      store.add('tags', { id: 100 });
+      store
+        .add('tags', { id: 100 })
+        .add('tags', { id: 101 });
 
-      expect(store.count('tags')).to.eq(1);
+      expect(store.count('tags')).to.eq(2);
     });
   });
 
