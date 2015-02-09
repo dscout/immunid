@@ -2,8 +2,9 @@ var chai      = require('chai');
 var sinon     = require('sinon');
 var sinonChai = require('sinon-chai');
 var expect    = chai.expect;
-var Store     = require('../lib/Store');
+var Adapter   = require('../lib/Adapter');
 var Model     = require('../lib/Model');
+var Store     = require('../lib/Store');
 
 describe('Store', function() {
   describe('#add', function() {
@@ -169,6 +170,44 @@ describe('Store', function() {
   });
 
   describe('#reload', function() {
+    var server;
+    var TagModel = Model.extend({
+      path: function() {
+        return '/tags/100'
+      }
+    });
+
+    beforeEach(function() {
+      server = sinon.fakeServer.create();
+    });
+
+    afterEach(function() {
+      server.restore();
+    });
+
+    it('returns the updated model', function() {
+      var adapter = new Adapter();
+      var store   = new Store(adapter, { 'Tag': TagModel });
+      var payload = {
+        tag: { id: 100, name: 'beta', comment_ids: [1] },
+        comments: [{ id: 1 }]
+      };
+
+      server.respondWith('GET', '/tags/100', [200, {}, JSON.stringify(payload)]);
+
+      store.add('tags', { id: 100, name: 'alpha' });
+
+      var model  = store.get('tags', 100);
+      var promise = store.reload(model).then(function(result) {
+        expect(store.count('comments')).to.eq(1);
+        expect(result.id).to.eq(model.id);
+      });
+
+      server.respond();
+
+      return promise;
+    });
+
     it('instructs the adapter to reload the model', function() {
       var store   = new Store();
       var adapter = store.adapter;
@@ -176,7 +215,7 @@ describe('Store', function() {
       sinon.spy(adapter, 'read');
 
       store.add('tags', { id: 100 });
-      store.reload('tags', { id: 100 });
+      store.reload({ id: 100 });
 
       expect(adapter.read).to.be.called;
     });
