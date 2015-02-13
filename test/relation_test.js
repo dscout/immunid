@@ -27,9 +27,8 @@ describe('Relation', function() {
   };
 
   it('associates multiple existing objects through hasMany', function() {
-    store
-      .add('tags', { id: 1, name: 'alpha' })
-      .add('tags', { id: 2, name: 'beta'  })
+    store.add('tags', { id: 1, name: 'alpha' });
+    store.add('tags', { id: 2, name: 'beta'  });
 
     var submission = new Submission({
       tag_ids:  [1, 2],

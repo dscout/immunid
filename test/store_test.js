@@ -12,7 +12,7 @@ describe('Store', function() {
       var store  = new Store();
       var result = store.add('tags', { id: 100 });
 
-      expect(result).to.eql(store);
+      expect(store.get('tags', 100)).to.eql(result);
     });
 
     it('vivifies data into a model wrapper', function() {
@@ -82,9 +82,8 @@ describe('Store', function() {
       var objectA = { id: 100 };
       var objectB = { id: 101 };
 
-      store
-        .add('tags', objectA)
-        .add('tags', objectB);
+      store.add('tags', objectA);
+      store.add('tags', objectB);
 
       expect(store.some('tags', [100, 101])).to.have.length(2);
     });
@@ -94,9 +93,8 @@ describe('Store', function() {
     it('retrieves all objects where a condition is true', function() {
       var store = new Store();
 
-      store
-        .add('tags', { id: 100, name: 'alpha', group: 'greek' })
-        .add('tags', { id: 101, name: 'beta',  group: 'greek' })
+      store.add('tags', { id: 100, name: 'alpha', group: 'greek' });
+      store.add('tags', { id: 101, name: 'beta',  group: 'greek' });
 
       expect(store.where('tags', { name: 'beta' })).to.have.length(1);
     });
@@ -106,9 +104,8 @@ describe('Store', function() {
     it('counts the number of objects within a namespace', function() {
       var store = new Store();
 
-      store
-        .add('tags', { id: 100 })
-        .add('tags', { id: 101 });
+      store.add('tags', { id: 100 });
+      store.add('tags', { id: 101 });
 
       expect(store.count('tags')).to.eq(2);
     });
