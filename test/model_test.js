@@ -7,34 +7,34 @@ var Model     = require('../lib/Model');
 chai.use(sinonChai);
 
 describe('Model', function() {
-  var Foo = Model.extend({});
+  var Tag = Model.extend({});
 
   describe('.path', function() {
     it('defines abstract path functions', function() {
       expect(function() {
-        Foo.path()
+        Tag.path()
       }).to.throw(Error);
     });
   });
 
   describe('#initialize', function() {
     it('calls initialize immediately after construction', function() {
-      sinon.spy(Foo.prototype, 'initialize');
+      sinon.spy(Tag.prototype, 'initialize');
 
       var attr = { id: 100 };
       var opts = { opt: true };
-      var foo  = new Foo(attr, opts);
+      var tag  = new Tag(attr, opts);
 
-      expect(foo.initialize.calledOnce).to.be.true;
-      expect(foo.initialize.calledWith(attr, opts)).to.be.true;
+      expect(tag.initialize.calledOnce).to.be.true;
+      expect(tag.initialize.calledWith(attr, opts)).to.be.true;
     });
   });
 
   describe('#mixins', function() {
     it('merges any mixins during construction', function() {
       var SomeMixin = {
-        foo: function() {
-          return 'footastic';
+        tag: function() {
+          return 'tagtastic';
         }
       };
 
@@ -44,21 +44,50 @@ describe('Model', function() {
 
       var instance = new Mixinified();
 
-      expect(instance.foo()).to.eq('footastic');
+      expect(instance.tag()).to.eq('tagtastic');
+    });
+  });
+
+  describe('#dump', function() {
+    it('provides a clone of the attributes', function() {
+      var tag = new Tag({ id: 100, name: 'alpha' });
+
+      expect(tag.dump()).to.eql({
+        id: 100,
+        name: 'alpha'
+      });
+    });
+
+    it('provides a rooted object', function() {
+      var tag = new Tag({ id: 100, name: 'alpha' }, { namespace: 'tags' });
+
+      expect(tag.dump({ rooted: true })).to.eql({
+        tag: { id: 100, name: 'alpha' }
+      });
+    });
+  });
+
+  describe('#toJSON', function() {
+    it('provides a rooted dump', function() {
+      var tag = new Tag({ id: 100, name: 'alpha' }, { namespace: 'tags' });
+
+      expect(tag.toJSON()).to.eql({
+        tag: { id: 100, name: 'alpha' }
+      });
     });
   });
 
   describe('#get', function() {
     it('fetches set properties', function() {
-      var foo = new Foo({ name: 'alpha' });
+      var tag = new Tag({ name: 'alpha' });
 
-      expect(foo.get('name')).to.eq('alpha');
+      expect(tag.get('name')).to.eq('alpha');
     });
   });
 
   describe('#has', function() {
     it('is the boolean presence of an attribute', function() {
-      var foo = new Foo({
+      var tag = new Tag({
         name:    'alpha',
         bool:    false,
         blank:   '',
@@ -66,42 +95,42 @@ describe('Model', function() {
         missing: undefined
       });
 
-      expect(foo.has('name')).to.be.true;
-      expect(foo.has('bool')).to.be.true;
-      expect(foo.has('blank')).to.be.true;
-      expect(foo.has('empty')).to.be.false;
-      expect(foo.has('missing')).to.be.false;
+      expect(tag.has('name')).to.be.true;
+      expect(tag.has('bool')).to.be.true;
+      expect(tag.has('blank')).to.be.true;
+      expect(tag.has('empty')).to.be.false;
+      expect(tag.has('missing')).to.be.false;
     });
   });
 
   describe('#set', function() {
     it('sets properites in key, value form', function() {
-      var foo = new Foo();
+      var tag = new Tag();
 
-      foo.set('name', 'alpha');
+      tag.set('name', 'alpha');
 
-      expect(foo.get('name')).to.eq('alpha');
+      expect(tag.get('name')).to.eq('alpha');
     });
 
     it('sets properties from an object', function() {
-      var foo = new Foo();
+      var tag = new Tag();
 
-      foo.set({ name: 'alpha' });
+      tag.set({ name: 'alpha' });
 
-      expect(foo.get('name')).to.eq('alpha');
+      expect(tag.get('name')).to.eq('alpha');
     });
 
     it('triggers a change event for each property', function() {
-      var foo     = new Foo({ name: 'alpha', page: 'index' }),
+      var tag     = new Tag({ name: 'alpha', page: 'index' }),
           nameSpy = sinon.spy(),
           pageSpy = sinon.spy(),
           anySpy  = sinon.spy();
 
-      foo.on('change:name', nameSpy);
-      foo.on('change:page', pageSpy);
-      foo.on('change', anySpy);
+      tag.on('change:name', nameSpy);
+      tag.on('change:page', pageSpy);
+      tag.on('change', anySpy);
 
-      foo.set({ name: 'beta', page: 'title' });
+      tag.set({ name: 'beta', page: 'title' });
 
       expect(nameSpy.called).to.be.true;
       expect(pageSpy.called).to.be.true;
@@ -109,14 +138,14 @@ describe('Model', function() {
     });
 
     it('does not trigger events when nothing changes', function() {
-      var foo     = new Foo({ name: 'alpha' });
+      var tag     = new Tag({ name: 'alpha' });
       var nameSpy = sinon.spy();
       var anySpy  = sinon.spy();
 
-      foo.on('change:name', nameSpy);
-      foo.on('change', anySpy);
+      tag.on('change:name', nameSpy);
+      tag.on('change', anySpy);
 
-      foo.set({ name: 'alpha' });
+      tag.set({ name: 'alpha' });
 
       expect(nameSpy.called).to.be.false;
       expect(anySpy.called).to.be.false;
@@ -125,16 +154,16 @@ describe('Model', function() {
 
   describe('#unset', function() {
     it('removes an attribute from the model', function() {
-      var foo     = new Foo({ name: 'alpha' });
+      var tag     = new Tag({ name: 'alpha' });
       var nameSpy = sinon.spy();
       var allSpy  = sinon.spy();
 
-      foo.on('change:name', nameSpy);
-      foo.on('change', allSpy);
+      tag.on('change:name', nameSpy);
+      tag.on('change', allSpy);
 
-      foo.unset('name');
+      tag.unset('name');
 
-      expect(foo.has('name')).to.be.false;
+      expect(tag.has('name')).to.be.false;
       expect(nameSpy.called).to.be.true;
       expect(allSpy.called).to.be.true;
     });
@@ -142,17 +171,17 @@ describe('Model', function() {
 
   describe('#clear', function() {
     it('clears all attributes on the model', function() {
-      var foo     = new Foo({ id: 1, name: 'alpha' });
+      var tag     = new Tag({ id: 1, name: 'alpha' });
       var nameSpy = sinon.spy();
       var anySpy  = sinon.spy();
 
-      foo.on('change:name', nameSpy);
-      foo.on('change', anySpy);
+      tag.on('change:name', nameSpy);
+      tag.on('change', anySpy);
 
-      foo.clear();
+      tag.clear();
 
-      expect(foo.get('id')).to.be.undefined;
-      expect(foo.get('name')).to.be.undefined;
+      expect(tag.get('id')).to.be.undefined;
+      expect(tag.get('name')).to.be.undefined;
 
       expect(nameSpy.calledOnce).to.be.true;
       expect(anySpy.calledOnce).to.be.true;
@@ -163,11 +192,11 @@ describe('Model', function() {
     it('delegates a reload to the store', function() {
       var reload = sinon.spy();
       var store  = { reload: reload };
-      var foo    = new Foo({ id: 1 }, { store: store });
+      var tag    = new Tag({ id: 1 }, { store: store });
 
-      foo.reload();
+      tag.reload();
 
-      expect(reload).to.be.calledWith(foo);
+      expect(reload).to.be.calledWith(tag);
     });
   });
 
@@ -175,11 +204,11 @@ describe('Model', function() {
     it('deletes the model remotely', function() {
       var destroy = sinon.spy();
       var store   = { destroy: destroy };
-      var foo     = new Foo({ id: 1 }, { store: store });
+      var tag     = new Tag({ id: 1 }, { store: store });
 
-      foo.destroy();
+      tag.destroy();
 
-      expect(destroy).to.be.calledWith(foo);
+      expect(destroy).to.be.calledWith(tag);
     });
   });
 
@@ -187,11 +216,11 @@ describe('Model', function() {
     it('updates the model and persists the changes', function() {
       var save  = sinon.spy();
       var store = { save: save };
-      var foo   = new Foo({ id: 1 }, { store: store });
+      var tag   = new Tag({ id: 1 }, { store: store });
 
-      foo.save();
+      tag.save();
 
-      expect(save).to.be.calledWith(foo);
+      expect(save).to.be.calledWith(tag);
     });
   });
 });
