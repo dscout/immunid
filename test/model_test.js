@@ -17,6 +17,22 @@ describe('Model', function() {
     });
   });
 
+  describe('#path', function() {
+    it('defaults to the constructor path without an id', function() {
+      Tag.path = function() { return '/tags' };
+
+      expect(new Tag().path()).to.eq('/tags');
+    });
+
+    it('includes the model id when present', function() {
+      Tag.path = function() { return '/tags' };
+
+      var tag = new Tag({ id: 100 });
+
+      expect(tag.path()).to.eq('/tags/100');
+    });
+  });
+
   describe('#initialize', function() {
     it('calls initialize immediately after construction', function() {
       sinon.spy(Tag.prototype, 'initialize');
