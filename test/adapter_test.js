@@ -62,8 +62,8 @@ describe('Adapter', function() {
 
       var adapter = new Adapter();
       var model   = {
-        path: function() { return '/comments'; },
-        dump: function() { return { body: 'Yay!' } }
+        path:   function() { return '/comments'; },
+        toJSON: function() { return { body: 'Yay!' } }
       };
 
       adapter.create(model).then(function(response) {
