@@ -55,16 +55,6 @@ describe('Store', function() {
         expect(tag.name).to.eq('gamma');
       });
     });
-
-    it('emits an add event', function() {
-      var store  = new Store();
-      var listen = sinon.spy();
-
-      store.on(Store.ADD_EVENT, listen);
-      store.add('tags', { id: 100 });
-
-      expect(listen).to.be.called;
-    });
   });
 
   describe('#find', function() {
@@ -164,18 +154,6 @@ describe('Store', function() {
 
       expect(adapter.delete).to.be.called;
     });
-
-    it('emits a delete event', function() {
-      var store  = new Store();
-      var listen = sinon.spy();
-
-      store.on(Store.DELETE_EVENT, listen);
-      store.add('tags', { id: 100 });
-
-      return store.delete('tags', { id: 100 }).then(function() {
-        expect(listen).to.be.called;
-      });
-    });
   });
 
   describe('#reload', function() {
@@ -227,17 +205,6 @@ describe('Store', function() {
       store.reload({ id: 100 });
 
       expect(adapter.read).to.be.called;
-    });
-
-    it('emits a reload event', function() {
-      var store  = new Store();
-      var listen = sinon.spy();
-
-      store.on(Store.RELOAD_EVENT, listen);
-
-      return store.reload({ id: 100 }).then(function() {
-        expect(listen).to.be.called;
-      });
     });
   });
 
