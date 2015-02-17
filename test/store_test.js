@@ -245,23 +245,13 @@ describe('Store', function() {
     it('instructs the adapter to update the model', function() {
       var store   = new Store();
       var adapter = store.adapter;
+      var model   = store.build('tags', { id: 100 });
 
       sinon.spy(adapter, 'update');
 
-      store.save({ id: 100 });
+      store.save(model);
 
       expect(adapter.update).to.be.called;
-    });
-
-    it('emits a change event', function() {
-      var store  = new Store();
-      var listen = sinon.spy();
-
-      store.on(Store.CHANGE_EVENT, listen);
-
-      return store.save({ id: 100 }).then(function(model) {
-        expect(listen).to.be.called;
-      });
     });
   });
 });

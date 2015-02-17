@@ -66,4 +66,26 @@ describe('Store Integration', function() {
 
     return promise;
   });
+
+  it('inserts a created model into the store on save', function() {
+    var store   = new Store(adapter, { Tag: Tag });
+    var payload = { tag: { id: 101, name: 'alpha' } };
+    var model   = store.build('tags', { name: 'alpha' });
+
+    server.respondWith('POST', '/tags', [
+      201, {}, JSON.stringify(payload)
+    ]);
+
+    var promise = model.save().then(function(tag) {
+      expect(tag).to.exist;
+      expect(tag.id).to.eq(101);
+      expect(tag.get('name')).to.eq('alpha');
+      expect(store.count('tags')).to.eq(1);
+      expect(store.get('tags', 101)).to.eql(tag);
+    });
+
+    server.respond();
+
+    return promise;
+  });
 });
