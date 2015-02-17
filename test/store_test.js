@@ -7,6 +7,18 @@ var Model     = require('../lib/Model');
 var Store     = require('../lib/Store');
 
 describe('Store', function() {
+  describe('#build', function() {
+    it('vivifies a new model but does not persist it', function() {
+      var store = new Store();
+      var model = store.build('tags', { name: 'alpha' });
+
+      expect(model.id).not.to.exist;
+      expect(model.namespace).to.eq('tags');
+      expect(model.store).to.eql(store);
+      expect(store.count('tags')).to.eq(0);
+    });
+  });
+
   describe('#add', function() {
     it('stores the object within a particular namespace', function() {
       var store  = new Store();
