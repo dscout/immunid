@@ -38,8 +38,8 @@ describe('Relation', function() {
     var tags = submission.tags();
 
     expect(tags).to.exist;
-    expect(tags).to.have.length(2);
-    expect(toAttributes(tags)).to.eql([
+    expect(tags.all()).to.have.length(2);
+    expect(toAttributes(tags.all())).to.eql([
       { id: 1, name: 'alpha' },
       { id: 2, name: 'beta' }
     ]);
@@ -48,8 +48,8 @@ describe('Relation', function() {
   it('returns an empty collection without any ids', function() {
     var submission = new Submission({});
 
-    expect(submission.tags()).to.be.empty;
-    expect(submission.author()).not.to.exist;
+    expect(submission.tags().all()).to.be.empty;
+    expect(submission.author().get()).not.to.exist;
   });
 
   it('associates a single object through hasOne', function() {
@@ -61,7 +61,22 @@ describe('Relation', function() {
 
     var author = submission.author()
 
-    expect(author).to.exist;
-    expect(author.attributes).to.eql({ id: 1, name: 'John Doe' });
+    expect(author.get()).to.exist;
+    expect(author.get().attributes).to.eql({ id: 1, name: 'John Doe' });
+  });
+
+  it('proxies synchronous store methods', function() {
+    store.add('tags', { id: 1, name: 'alpha' });
+    store.add('tags', { id: 2, name: 'beta'  });
+
+    var submission = new Submission({
+      tag_ids:  [1, 2],
+      note_ids: [1]
+    });
+
+    var tags = submission.tags();
+
+    expect(tags.all()).to.have.length(2);
+    expect(tags.get(2)).to.exist;
   });
 });

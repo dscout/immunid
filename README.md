@@ -85,10 +85,15 @@ the associated models.
 
 ```javascript
 var Project = Model.extend({
-  account:   Relation.hasOne('account'),
-  missions:  Relation.hasMany('mission'),
-  screeners: Relation.hasMany('screener')
+  account:     Relation.hasOne('account'),
+  missions:    Relation.hasMany('mission'),
+  screeners:   Relation.hasMany('screener'),
+  memberships: Relation.hasMany('membership')
 });
+
+project.memberships.all()   // Returns array of loaded memberships
+project.memberships.find()  // Performs GET /projects/25/memberships
+project.memberships.find(1) // Performs GET /projects/25/memberships/1
 ```
 
 ## Contributing
