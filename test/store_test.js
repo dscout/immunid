@@ -78,6 +78,18 @@ describe('Store', function() {
     });
   });
 
+  describe('#clear', function() {
+    it('removes all models in a namespace', function() {
+      var store = new Store();
+
+      store.add('tags', { id: 100 });
+      store.add('tags', { id: 101 });
+      store.clear('tags');
+
+      expect(store.all('tags')).to.be.empty;
+    });
+  });
+
   describe('#some', function() {
     it('retrieves each from a list of ids', function() {
       var store   = new Store();
