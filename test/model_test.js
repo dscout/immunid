@@ -46,6 +46,16 @@ describe('Model', function() {
     });
   });
 
+  describe('#isNew', function() {
+    it('is the boolean presence of an id attribute', function() {
+      var tag1 = new Tag();
+      var tag2 = new Tag({ id: 100 });
+
+      expect(tag1.isNew()).to.be.true;
+      expect(tag2.isNew()).to.be.false;
+    });
+  });
+
   describe('#mixins', function() {
     it('merges any mixins during construction', function() {
       var SomeMixin = {
