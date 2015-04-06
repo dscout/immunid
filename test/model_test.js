@@ -228,13 +228,13 @@ describe('Model', function() {
 
   describe('#destroy', function() {
     it('deletes the model remotely', function() {
-      var destroy = sinon.spy();
-      var store   = { destroy: destroy };
-      var tag     = new Tag({ id: 1 }, { store: store });
+      var del   = sinon.spy();
+      var store = { 'delete': del };
+      var tag   = new Tag({ id: 1 }, { store: store });
 
       tag.destroy();
 
-      expect(destroy).to.be.calledWith(tag);
+      expect(del).to.be.calledWith(tag);
     });
   });
 
