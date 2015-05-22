@@ -145,26 +145,26 @@ describe('Store', function() {
     });
   });
 
-  describe('#delete', function() {
+  describe('#destroy', function() {
     it('removes the model from its bucket', function() {
-      var store = new Store();
+      var store   = new Store();
 
       store.add('tags', { id: 100 });
-      store.delete({ namespace: 'tags', id: 100 });
+      store.destroy({ namespace: 'tags', id: 100 });
 
       expect(store.count('tags')).to.eq(0);
     });
 
     it('instructs the adapter to persist deletion', function() {
-      var store   = new Store(adapter);
+      var store   = new Store();
       var adapter = store.adapter;
 
-      sinon.spy(adapter, 'delete');
+      sinon.spy(adapter, 'destroy');
 
       store.add('tags', { id: 100 });
-      store.delete('tags', { id: 100 });
+      store.destroy('tags', { id: 100 });
 
-      expect(adapter.delete).to.be.called;
+      expect(adapter.destroy).to.be.called;
     });
   });
 
