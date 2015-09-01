@@ -3,11 +3,13 @@ var sinon     = require('sinon');
 var sinonChai = require('sinon-chai');
 var expect    = chai.expect;
 var Model     = require('../lib/Model');
+var Store     = require('../lib/Store');
 
 chai.use(sinonChai);
 
 describe('Model', function() {
-  var Tag = Model.extend({});
+  var Tag   = Model.extend({}),
+      store = new Store(null, { Tag: Tag });
 
   describe('.path', function() {
     it('defines abstract path functions', function() {
@@ -131,7 +133,7 @@ describe('Model', function() {
 
   describe('#set', function() {
     it('sets properites in key, value form', function() {
-      var tag = new Tag();
+      var tag = store.build('tags', {});
 
       tag.set('name', 'alpha');
 
@@ -139,78 +141,59 @@ describe('Model', function() {
     });
 
     it('sets properties from an object', function() {
-      var tag = new Tag();
+      var tag = store.build('tags', {});
 
       tag.set({ name: 'alpha' });
 
       expect(tag.get('name')).to.eq('alpha');
     });
 
-    it('triggers a change event for each property', function() {
-      var tag     = new Tag({ name: 'alpha', page: 'index' }),
-          nameSpy = sinon.spy(),
-          pageSpy = sinon.spy(),
-          anySpy  = sinon.spy();
-
-      tag.on('change:name', nameSpy);
-      tag.on('change:page', pageSpy);
-      tag.on('change', anySpy);
+    it('triggers a change event through the store', function() {
+      var store   = new Store(null, { Tag: Tag }),
+          tag     = store.build('tags', { name: 'alpha', page: 'index' }),
+          emitSpy = sinon.spy(store, 'emit');
 
       tag.set({ name: 'beta', page: 'title' });
 
-      expect(nameSpy.called).to.be.true;
-      expect(pageSpy.called).to.be.true;
-      expect(anySpy.called).to.be.true;
+      expect(emitSpy).to.be.calledWith('tags:change', tag);
     });
 
     it('does not trigger events when nothing changes', function() {
-      var tag     = new Tag({ name: 'alpha' });
-      var nameSpy = sinon.spy();
-      var anySpy  = sinon.spy();
-
-      tag.on('change:name', nameSpy);
-      tag.on('change', anySpy);
+      var store   = new Store(null, { Tag: Tag }),
+          tag     = store.build('tags', { name: 'alpha' }),
+          emitSpy = sinon.spy(store, 'emit');
 
       tag.set({ name: 'alpha' });
 
-      expect(nameSpy.called).to.be.false;
-      expect(anySpy.called).to.be.false;
+      expect(emitSpy).not.to.be.called;
     });
   });
 
   describe('#unset', function() {
     it('removes an attribute from the model', function() {
-      var tag     = new Tag({ name: 'alpha' });
-      var nameSpy = sinon.spy();
-      var allSpy  = sinon.spy();
-
-      tag.on('change:name', nameSpy);
-      tag.on('change', allSpy);
+      var store   = new Store(null, { Tag: Tag }),
+          tag     = store.build('tags', { name: 'alpha' });
+          emitSpy = sinon.spy(store, 'emit');
 
       tag.unset('name');
 
       expect(tag.has('name')).to.be.false;
-      expect(nameSpy.called).to.be.true;
-      expect(allSpy.called).to.be.true;
+      expect(emitSpy).to.be.calledWith('tags:change', tag);
     });
   });
 
   describe('#clear', function() {
     it('clears all attributes on the model', function() {
-      var tag     = new Tag({ id: 1, name: 'alpha' });
-      var nameSpy = sinon.spy();
-      var anySpy  = sinon.spy();
-
-      tag.on('change:name', nameSpy);
-      tag.on('change', anySpy);
+      var store   = new Store(null, { Tag: Tag }),
+          tag     = store.build('tags', { id: 1, name: 'alpha' }),
+          emitSpy = sinon.spy(store, 'emit');
 
       tag.clear();
 
       expect(tag.get('id')).to.be.undefined;
       expect(tag.get('name')).to.be.undefined;
 
-      expect(nameSpy.calledOnce).to.be.true;
-      expect(anySpy.calledOnce).to.be.true;
+      expect(emitSpy).to.be.calledWith('tags:change', tag);
     });
   });
 

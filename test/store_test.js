@@ -233,4 +233,44 @@ describe('Store', function() {
       expect(adapter.update).to.be.called;
     });
   });
+
+  describe('#events', function() {
+    it('registers and listens for events', function() {
+      var store     = new Store();
+      var callbackA = sinon.spy();
+      var callbackB = sinon.spy();
+      var callbackC = sinon.spy();
+
+      store.on('foo:change', callbackA, this);
+      store.on('foo:change', callbackB, this);
+      store.on('bar:change', callbackC, this);
+
+      store.emit('foo:change', 'value');
+
+      expect(callbackA).to.be.calledWith('value');
+      expect(callbackB).to.be.calledWith('value');
+      expect(callbackC).not.to.be.called;
+    });
+
+    it('removes registered event listeners', function() {
+      var store     = new Store();
+      var callbackA = sinon.spy();
+      var callbackB = sinon.spy();
+
+      store.on('foo:change', callbackA, this);
+      store.on('foo:change', callbackB, this);
+      store.emit('foo:change');
+
+      store.off('foo:change', callbackA, this);
+      store.emit('foo:change');
+
+      expect(callbackA).to.be.calledOnce;
+      expect(callbackB).to.be.calledTwice;
+
+      store.off('foo:change', null, null);
+      store.emit('foo:change');
+
+      expect(callbackB).to.be.calledTwice;
+    });
+  });
 });
