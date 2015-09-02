@@ -12,22 +12,40 @@ describe('Adapter', function() {
     server.restore();
   });
 
-  describe('#_buildRequest', function() {
+  describe('any request', function() {
+    var request, xhr;
+
+    beforeEach(function() {
+      xhr = sinon.useFakeXMLHttpRequest();
+
+      xhr.onCreate = function(anXhr) {
+        request = anXhr;
+      }
+    });
+
+    afterEach(function() {
+      request = null;
+      xhr.restore();
+    });
+
     it('injects headers into the request', function() {
       var adapter = new Adapter({ headers: {
         'Accept' : 'application/json'
       }});
 
-      var request = adapter._buildRequest('GET', '/');
+      adapter.read({ path: function() { return '/comments' } });
 
-      expect(request.header).to.have.keys('Accept')
+      expect(request.requestHeaders).to.eql({
+        'Accept': 'application/json'
+      });
     });
 
     it('prepends the host to the path', function() {
       var adapter = new Adapter({ host: 'https://example.com' });
-      var request = adapter._buildRequest('GET', '/stuff');
 
-      expect(request.url).to.eq('https://example.com/stuff');
+      adapter.read({ path: function() { return '/comments' } });
+
+      expect(request.url).to.eq('https://example.com/comments');
     });
   });
 
