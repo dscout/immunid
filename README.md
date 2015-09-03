@@ -4,10 +4,9 @@
 
 * Robust relational data handling
 * Absolutely no view layer
-* Leverage an existing event system (EventEmitter)
 * Modularize via CommonJS
-* No reliance on jquery for ajax
-* No reliance on underscore or lodash for functions
+* No reliance on jQuery for ajax
+* No reliance on Underscore or lodash for functions
 * Promises, not callbacks
 * Emphasis on mixins
 
@@ -21,37 +20,46 @@ npm install immunid --save
 
 ### Retrieving Data
 
-All models must be created or retreived through the store. The store is what
+All models must be created or retrieved through the store. The store is what
 allows relational behavior, caching, and identity mapping. It is strictly
 possible to create a new instance of a model directly, but it will not be able
 to retrieve any associations.
 
 ```javascript
-// Performs a GET to `/posts/1`
-store.find('post', 1).then(function(post) {
+// create a model class
+var Post = Model.extend({
+  path: function() {
+    return '/posts';
+  }
+});
+
+// configure communication with your server
+var adapter = new Adapter({
+  headers: { 'Content-Type': 'application/json' },
+  host: '/api'
+});
+
+// create a store with an adapter and a mapping
+// the keys of the mapping become namespaces for your model classes
+// e.g. 'Post' -> 'posts'
+var store = new Store(adapter, {
+  'Post': Post
+});
+
+// Performs a GET to `/api/posts/1`
+store.find('posts', 1).then(function(post) {
+  // do something with the post
 });
 ```
 
 All data returned from the `GET` request to `/posts/1` will be parsed into the
 appropriate location within the store and wrapped in a corresponding model
-object. This allows the post to synchronously retrieve associated data. This
-mechanism relies on embedded ids within the parent record, which is the `post`
-in this example:
+object. This allows the `Post` to synchronously retrieve associated data. This
+mechanism relies on embedded ids within the parent record:
 
 ```javascript
 post.get('comment_ids'); // [1, 2, 3]
-post.comments(); // No request, returns an array of comments
-```
-
-In some situations it isn't feasible to pass down all of the associated records
-along with the parent. When that happens and you need to retrieve the associated
-data you can specify that a request should be made, along with some optional
-parameters:
-
-**WIP**
-
-```javascript
-post.comments({ fetch: true, page: 1 }); // GET /post/1/comments?page=1
+post.comments().all();   // No request, returns an array of comments
 ```
 
 The path used for a particular model or relation can be customized within the
@@ -70,9 +78,9 @@ var Comment = Model.extend({
 Records instantiated through the store expose some simple persistence methods.
 
 ```javascript
-model.save();
-model.reload();
-model.destroy();
+model.save();    // POST or PUT request to model.path()
+model.reload();  // GET request to model.path()
+model.destroy(); // DELETE request to model.path()
 ```
 
 Persisting models with associations does not create, update, or destroy any of
@@ -80,8 +88,8 @@ the associated models.
 
 ### Relating Records
 
-* There is no `belongsTo`, everything is `hasOne` currently
-* Relation names are always singular
+* There is no `belongsTo` relation. Only `hasOne` or `hasMany` currently.
+* Relation names are always singular.
 
 ```javascript
 var Project = Model.extend({
@@ -91,9 +99,64 @@ var Project = Model.extend({
   memberships: Relation.hasMany('membership')
 });
 
-project.memberships.all()   // Returns array of loaded memberships
-project.memberships.find()  // Performs GET /projects/25/memberships
-project.memberships.find(1) // Performs GET /projects/25/memberships/1
+project.account().get();     // Returns instance of loaded account
+project.memberships().all(); // Returns array of loaded memberships
+```
+
+### Events
+
+The store emits events under the model's namespace when a model instance is changed:
+
+```javascript
+var adapter = new Adapter();
+var Tag     = Model.extend({});
+var store   = new Store(adapter, { Tag: Tag });
+
+function handleChangeTag(tag) {
+  // tag is the model instance that has changed
+  // the value of `this` is bound to the store
+}
+
+var myTag = store.get('tags', 42).then(function(tag) {
+  store.on('tags:change', handleChangeTag); // subscribe event handler
+});
+
+myTag.set({ name: 'banana' }); // calls handleChangeTag
+myTag.unset('name');           // calls handleChangeTag
+myTag.clear();                 // calls handleChangeTag
+
+store.off('tags:change', handleChangeTag); // unsubscribe event handler
+```
+
+Set the event handler's `this` value with the third argument to `on`:
+
+```javascript
+var context = { model: null };
+
+function handleChange(model) {
+  // the value of `this` is the `context` object
+  this.model = model;
+}
+
+store.on('model:change',  handleChange, context);
+store.off('model:change', handleChange, content); // unsubscribe one handler
+store.off('model:change', null, null); // unsubscribe all handlers
+```
+
+The store additionally emits events when parsing a response from the server.
+The payload for `destroyed` will be a single model.
+The payload for `fetched`, `created`, `reloaded`, and `updated` will always be
+an array of one or more models:
+
+```javascript
+store.find('tags');     // store emits 'tags:fetched'
+store.find('tags', 42); // store emits 'tags:fetched'
+
+var tag = store.add('tags', { name: 'apple' });
+tag.save();                         // store emits 'tags:created'
+tag.reload();                       // store emits 'tags:reloaded'
+tag.set({ name: 'banana' }).save(); // store emits 'tags:updated'
+tag.destroy();                      // store emits 'tags:destroyed'
 ```
 
 ## Contributing
