@@ -104,13 +104,15 @@ describe('Store', function() {
   });
 
   describe('#where', function() {
-    it('retrieves all objects where a condition is true', function() {
+    it('retrieves all models where a condition is true', function() {
       var store = new Store();
 
       store.add('tags', { id: 100, name: 'alpha', group: 'greek' });
       store.add('tags', { id: 101, name: 'beta',  group: 'greek' });
 
-      expect(store.where('tags', { name: 'beta' })).to.have.length(1);
+      expect(store.where('tags', { name: 'beta' })).to.eql([
+        store.get('tags', 101)
+      ]);
     });
   });
 
