@@ -172,7 +172,7 @@ describe('Model', function() {
 
       tag.set({ name: 'beta', page: 'title' });
 
-      expect(emitSpy).to.be.calledWith('tags:change', tag);
+      expect(emitSpy).to.be.calledWith('tags:changed', tag);
     });
 
     it('does not trigger events when nothing changes', function() {
@@ -201,7 +201,7 @@ describe('Model', function() {
       tag.unset('name');
 
       expect(tag.has('name')).to.be.false;
-      expect(emitSpy).to.be.calledWith('tags:change', tag);
+      expect(emitSpy).to.be.calledWith('tags:changed', tag);
     });
 
     it('does not unset attributes not specified', function() {
@@ -211,7 +211,7 @@ describe('Model', function() {
 
       expect(tag.has('group')).to.be.false;
       expect(tag.get('name')).to.eq('alpha');
-      expect(emitSpy).to.be.calledWith('tags:change', tag);
+      expect(emitSpy).to.be.calledWith('tags:changed', tag);
     });
   });
 
@@ -234,7 +234,7 @@ describe('Model', function() {
       expect(tag.get('id')).to.be.undefined;
       expect(tag.get('name')).to.be.undefined;
 
-      expect(emitSpy).to.be.calledWith('tags:change', tag);
+      expect(emitSpy).to.be.calledWith('tags:changed', tag);
     });
   });
 
