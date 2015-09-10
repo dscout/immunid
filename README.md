@@ -105,7 +105,8 @@ project.memberships().all(); // Returns array of loaded memberships
 
 ### Events
 
-The store emits events under the model's namespace when a model instance is changed:
+The store emits events under namespaces when model instances are changed.
+Event names are always past tense to indicate the model is ready for use:
 
 ```javascript
 var adapter = new Adapter();
@@ -114,18 +115,18 @@ var store   = new Store(adapter, { Tag: Tag });
 
 function handleChangeTag(tag) {
   // tag is the model instance that has changed
-  // the value of `this` is bound to the store
+  // `this` value is implicitly bound to the store
 }
 
 var myTag = store.get('tags', 42).then(function(tag) {
-  store.on('tags:change', handleChangeTag); // subscribe event handler
+  store.on('tags:changed', handleChangeTag); // subscribe
 });
 
 myTag.set({ name: 'banana' }); // calls handleChangeTag
 myTag.unset('name');           // calls handleChangeTag
 myTag.clear();                 // calls handleChangeTag
 
-store.off('tags:change', handleChangeTag); // unsubscribe event handler
+store.off('tags:changed', handleChangeTag); // unsubscribe
 ```
 
 Set the event handler's `this` value with the third argument to `on`:
@@ -133,31 +134,41 @@ Set the event handler's `this` value with the third argument to `on`:
 ```javascript
 var context = { model: null };
 
+store.on('model:changed', handleChange, context);
+
 function handleChange(model) {
-  // the value of `this` is the `context` object
+  // `this` value is the `context` object
   this.model = model;
 }
-
-store.on('model:change',  handleChange, context);
-store.off('model:change', handleChange, content); // unsubscribe one handler
-store.off('model:change', null, null); // unsubscribe all handlers
 ```
 
-The store additionally emits events when parsing a response from the server.
-The payload for `destroyed` will be a single model.
-The payload for `fetched`, `created`, `reloaded`, and `updated` will always be
-an array of one or more models:
+There are a few ways to unsubscribe event handlers:
+
+```javascript
+// unsubscribe `handleChange` handler
+store.off('tags:changed', handleChange);
+// unsubscribe all `tags:changed` handlers
+store.off('tags:changed', null, null);
+// unsubscribe all handlers from `tags` namespace
+store.off('tags', null, null);
+```
+
+The store also emits events when parsing a response from the server:
 
 ```javascript
 store.find('tags');     // store emits 'tags:fetched'
 store.find('tags', 42); // store emits 'tags:fetched'
 
-var tag = store.add('tags', { name: 'apple' });
+var tag = store.build('tags', { name: 'apple' });
 tag.save();                         // store emits 'tags:created'
 tag.reload();                       // store emits 'tags:reloaded'
 tag.set({ name: 'banana' }).save(); // store emits 'tags:updated'
 tag.destroy();                      // store emits 'tags:destroyed'
 ```
+
+The payload for `fetched`, `created`, `reloaded`, and `updated` events will be
+an array of one or more models. The payload for `destroyed` events will be a
+single model.
 
 ## Contributing
 
