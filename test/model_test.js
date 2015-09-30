@@ -3,11 +3,13 @@ var sinon     = require('sinon');
 var sinonChai = require('sinon-chai');
 var expect    = chai.expect;
 var Model     = require('../lib/Model');
+var Store     = require('../lib/Store');
 
 chai.use(sinonChai);
 
 describe('Model', function() {
-  var Tag = Model.extend({});
+  var Tag   = Model.extend({}),
+      store = new Store(null, { Tag: Tag });
 
   describe('.path', function() {
     it('defines abstract path functions', function() {
@@ -48,8 +50,8 @@ describe('Model', function() {
 
   describe('#isNew', function() {
     it('is the boolean presence of an id attribute', function() {
-      var tag1 = new Tag();
-      var tag2 = new Tag({ id: 100 });
+      var tag1 = new Tag(),
+          tag2 = new Tag({ id: 100 });
 
       expect(tag1.isNew()).to.be.true;
       expect(tag2.isNew()).to.be.false;
@@ -130,95 +132,117 @@ describe('Model', function() {
   });
 
   describe('#set', function() {
+    var emitSpy;
+
+    beforeEach(function() {
+      emitSpy = sinon.spy(store, 'emit');
+    });
+
+    afterEach(function() {
+      emitSpy.restore();
+    });
+
     it('sets properites in key, value form', function() {
-      var tag = new Tag();
+      var tag = store.build('tags', { name: 'alpha' });
 
-      tag.set('name', 'alpha');
+      tag.set('name', 'beta');
 
-      expect(tag.get('name')).to.eq('alpha');
+      expect(tag.get('name')).to.eq('beta');
     });
 
     it('sets properties from an object', function() {
-      var tag = new Tag();
+      var tag = store.build('tags', { name: 'alpha' });
 
-      tag.set({ name: 'alpha' });
+      tag.set({ name: 'beta' });
 
-      expect(tag.get('name')).to.eq('alpha');
+      expect(tag.get('name')).to.eq('beta');
     });
 
-    it('triggers a change event for each property', function() {
-      var tag     = new Tag({ name: 'alpha', page: 'index' }),
-          nameSpy = sinon.spy(),
-          pageSpy = sinon.spy(),
-          anySpy  = sinon.spy();
+    it('does not overwrite properties that have not changed', function() {
+      var tag = store.build('tags', { name: 'alpha', group: 'one' });
 
-      tag.on('change:name', nameSpy);
-      tag.on('change:page', pageSpy);
-      tag.on('change', anySpy);
+      tag.set({ name: 'beta' });
+
+      expect(tag.get('name')).to.eq('beta');
+      expect(tag.get('group')).to.eq('one');
+    });
+
+    it('triggers a change event through the store', function() {
+      var tag = store.build('tags', { name: 'alpha', page: 'index' });
 
       tag.set({ name: 'beta', page: 'title' });
 
-      expect(nameSpy.called).to.be.true;
-      expect(pageSpy.called).to.be.true;
-      expect(anySpy.called).to.be.true;
+      expect(emitSpy).to.be.calledWith('tags:changed', tag);
     });
 
     it('does not trigger events when nothing changes', function() {
-      var tag     = new Tag({ name: 'alpha' });
-      var nameSpy = sinon.spy();
-      var anySpy  = sinon.spy();
-
-      tag.on('change:name', nameSpy);
-      tag.on('change', anySpy);
+      var tag = store.build('tags', { name: 'alpha' });
 
       tag.set({ name: 'alpha' });
 
-      expect(nameSpy.called).to.be.false;
-      expect(anySpy.called).to.be.false;
+      expect(emitSpy).not.to.be.called;
     });
   });
 
   describe('#unset', function() {
-    it('removes an attribute from the model', function() {
-      var tag     = new Tag({ name: 'alpha' });
-      var nameSpy = sinon.spy();
-      var allSpy  = sinon.spy();
+    var emitSpy;
 
-      tag.on('change:name', nameSpy);
-      tag.on('change', allSpy);
+    beforeEach(function() {
+      emitSpy = sinon.spy(store, 'emit');
+    });
+
+    afterEach(function() {
+      emitSpy.restore();
+    });
+
+    it('removes an attribute from the model', function() {
+      var tag = store.build('tags', { name: 'alpha' });
 
       tag.unset('name');
 
       expect(tag.has('name')).to.be.false;
-      expect(nameSpy.called).to.be.true;
-      expect(allSpy.called).to.be.true;
+      expect(emitSpy).to.be.calledWith('tags:changed', tag);
+    });
+
+    it('does not unset attributes not specified', function() {
+      var tag = store.build('tags', { name: 'alpha', group: 'one' });
+
+      tag.unset('group');
+
+      expect(tag.has('group')).to.be.false;
+      expect(tag.get('name')).to.eq('alpha');
+      expect(emitSpy).to.be.calledWith('tags:changed', tag);
     });
   });
 
   describe('#clear', function() {
-    it('clears all attributes on the model', function() {
-      var tag     = new Tag({ id: 1, name: 'alpha' });
-      var nameSpy = sinon.spy();
-      var anySpy  = sinon.spy();
+    var emitSpy;
 
-      tag.on('change:name', nameSpy);
-      tag.on('change', anySpy);
+    beforeEach(function() {
+      emitSpy = sinon.spy(store, 'emit');
+    });
+
+    afterEach(function() {
+      emitSpy.restore();
+    });
+
+    it('clears all attributes on the model', function() {
+      var tag = store.build('tags', { id: 1, name: 'alpha' });
 
       tag.clear();
 
       expect(tag.get('id')).to.be.undefined;
       expect(tag.get('name')).to.be.undefined;
 
-      expect(nameSpy.calledOnce).to.be.true;
-      expect(anySpy.calledOnce).to.be.true;
+      expect(emitSpy).to.be.calledWith('tags:changed', tag);
     });
   });
 
   describe('#reload', function() {
     it('delegates a reload to the store', function() {
-      var reload = sinon.spy();
-      var store  = { reload: reload };
-      var tag    = new Tag({ id: 1 }, { store: store });
+      var reload = sinon.spy(),
+          store  = { reload: reload },
+          tag    = new Tag({ id: 1 }, { store: store });
 
       tag.reload();
 
@@ -228,9 +252,9 @@ describe('Model', function() {
 
   describe('#destroy', function() {
     it('deletes the model remotely', function() {
-      var destroy = sinon.spy();
-      var store   = { destroy: destroy };
-      var tag     = new Tag({ id: 1 }, { store: store });
+      var destroy = sinon.spy(),
+          store   = { destroy: destroy },
+          tag     = new Tag({ id: 1 }, { store: store });
 
       tag.destroy();
 
@@ -240,9 +264,9 @@ describe('Model', function() {
 
   describe('#save', function() {
     it('updates the model and persists the changes', function() {
-      var save  = sinon.spy();
-      var store = { save: save };
-      var tag   = new Tag({ id: 1 }, { store: store });
+      var save  = sinon.spy(),
+          store = { save: save },
+          tag   = new Tag({ id: 1 }, { store: store });
 
       tag.save();
 

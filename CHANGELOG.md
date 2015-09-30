@@ -1,18 +1,25 @@
 ## Unreleased
 
 * Rename project from osteo.js to immunid.
+* Remove `Model` events in favor of emitting events from the `Store`.
+* Favor replacing `attributes` and `buckets` with new objects over mutating
+  them.
+* Clean up the public API exported by `Adapter`, `Model`, `Relation`, and
+  `Store`.
+* Breaking change: `Store.where` returns array of matching models instead of
+  array of model ids.
 
 ## v0.8.0 (2014-06-09)
 
 * Exporting with AMD, CommonJS, browser globals. This is not a breaking change,
-  but significatn enough to warrant a minor version bump.
+  but significant enough to warrant a minor version bump.
 
 ## v0.7.1 (2014-06-07)
 
 * Ensure looked up models belong to the collection. The `lookup` method will
   create a new model if it fails to find a match. Previously it didn't always
   add the newly created model to the parent collection.
-* Preserve associated models when setting without assocation data.
+* Preserve associated models when setting without association data.
 * Create model relations during construction. This ensures that an empty
   associated collection is present even before additional data is fetched.
 * Preserve previous created associated collections. Fetching associated models

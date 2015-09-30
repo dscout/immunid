@@ -104,13 +104,15 @@ describe('Store', function() {
   });
 
   describe('#where', function() {
-    it('retrieves all objects where a condition is true', function() {
+    it('retrieves all models where a condition is true', function() {
       var store = new Store();
 
       store.add('tags', { id: 100, name: 'alpha', group: 'greek' });
       store.add('tags', { id: 101, name: 'beta',  group: 'greek' });
 
-      expect(store.where('tags', { name: 'beta' })).to.have.length(1);
+      expect(store.where('tags', { name: 'beta' })).to.eql([
+        store.get('tags', 101)
+      ]);
     });
   });
 
@@ -147,7 +149,7 @@ describe('Store', function() {
 
   describe('#destroy', function() {
     it('removes the model from its bucket', function() {
-      var store   = new Store();
+      var store = new Store();
 
       store.add('tags', { id: 100 });
       store.destroy({ namespace: 'tags', id: 100 });
@@ -162,7 +164,7 @@ describe('Store', function() {
       sinon.spy(adapter, 'destroy');
 
       store.add('tags', { id: 100 });
-      store.destroy('tags', { id: 100 });
+      store.destroy({ namespace: 'tags', id: 100 });
 
       expect(adapter.destroy).to.be.called;
     });
@@ -231,6 +233,140 @@ describe('Store', function() {
       store.save(model);
 
       expect(adapter.update).to.be.called;
+    });
+  });
+
+  describe('#events', function() {
+    var store;
+
+    beforeEach(function() {
+      store = new Store();
+    });
+
+    it('registers and listens for events', function() {
+      var callbackA = sinon.spy(),
+          callbackB = sinon.spy(),
+          callbackC = sinon.spy();
+
+      store.on('foo:changed', callbackA, this);
+      store.on('foo:changed', callbackB, this);
+      store.on('bar:changed', callbackC, this);
+
+      store.emit('foo:changed', 'value');
+
+      expect(callbackA).to.be.calledWith('value');
+      expect(callbackB).to.be.calledWith('value');
+      expect(callbackC).not.to.be.called;
+    });
+
+    it('removes registered event listeners', function() {
+      var callbackA = sinon.spy(),
+          callbackB = sinon.spy();
+
+      store.on('foo:changed', callbackA, this);
+      store.on('foo:changed', callbackB, this);
+      store.emit('foo:changed');
+
+      store.off('foo:changed', callbackA, this);
+      store.emit('foo:changed');
+
+      expect(callbackA).to.be.calledOnce;
+      expect(callbackB).to.be.calledTwice;
+
+      store.off('foo:changed', null, null);
+      store.emit('foo:changed');
+
+      expect(callbackB).to.be.calledTwice;
+    });
+
+    it('removes all event listeners from a namespace', function() {
+      var callbackA = sinon.spy(),
+          callbackB = sinon.spy(),
+          callbackC = sinon.spy();
+
+      store.on('foo:created',   callbackA, this);
+      store.on('foo:changed',   callbackB, this);
+      store.on('foo:destroyed', callbackC, this);
+
+      store.emit('foo:created');
+      store.emit('foo:changed');
+      store.emit('foo:destroyed');
+
+      store.off('foo', null, null);
+
+      store.emit('foo:created');
+      store.emit('foo:changed');
+      store.emit('foo:destroyed');
+
+      expect(callbackA).to.be.calledOnce;
+      expect(callbackB).to.be.calledOnce;
+      expect(callbackC).to.be.calledOnce;
+    });
+
+    it('emits a `fetched` event under a namespace', function() {
+      var fetchSpy = sinon.spy();
+
+      store.on('foobars:fetched', fetchSpy, this);
+
+      store.parse({ foobar: { id: 1, name: 'Foo' } }, { action: 'fetch' });
+
+      expect(fetchSpy).to.be.calledOnce;
+      expect(fetchSpy).to.be.calledWithMatch(store.all('foobars'));
+
+      store.off('foobars:fetched', null, null);
+    });
+
+    it('emits a `created` event under a namespace', function() {
+      var createSpy = sinon.spy();
+
+      store.on('foobars:created', createSpy, this);
+
+      store.parse({ foobar: { id: 2, name: 'Foo' } }, { action: 'create' });
+
+      expect(createSpy).to.be.calledOnce;
+      expect(createSpy).to.be.calledWithMatch(store.all('foobars'));
+
+      store.off('foobars:created', null, null);
+    });
+
+    it('emits an `updated` event under a namespace', function() {
+      var updateSpy = sinon.spy();
+
+      store.on('foobars:updated', updateSpy, this);
+
+      store.parse({ foobar: { id: 2, name: 'Foo' } }, { action: 'update' });
+
+      expect(updateSpy).to.be.calledOnce;
+      expect(updateSpy).to.be.calledWithMatch(store.all('foobars'));
+
+      store.off('foobars:updated', null, null);
+    });
+
+    it('emits a `reloaded` event under a namespace', function() {
+      var reloadSpy = sinon.spy();
+
+      store.on('foobars:reloaded', reloadSpy, this);
+
+      store.parse({ foobar: { id: 2, name: 'Foo' } }, { action: 'reload' });
+
+      expect(reloadSpy).to.be.calledOnce;
+      expect(reloadSpy).to.be.calledWithMatch(store.all('foobars'));
+
+      store.off('foobars:reloaded', null, null);
+    });
+
+    it('emits a `destroyed` event under a namespace', function() {
+      var destroySpy = sinon.spy(),
+          foobar = store.add('foobars', { id: 3, name: 'Foo' });
+
+      store.on('foobars:destroyed', destroySpy, this);
+
+      return store.destroy(foobar).then(function() {
+        expect(destroySpy).to.be.calledOnce;
+        expect(destroySpy).to.be.calledWithMatch(foobar);
+
+        store.off('foobars:destroyed', null, null);
+      });
     });
   });
 });
