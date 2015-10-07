@@ -86,6 +86,34 @@ model.destroy(); // DELETE request to model.path()
 Persisting models with associations does not create, update, or destroy any of
 the associated models.
 
+### Adding and Removing Records without Persistence
+
+Records can be added to or removed from the store without making a call to
+`#find` or `#destroy`:
+
+```javascript
+var store = new Store(adapter, {
+  'Post': Post
+});
+
+// instantiates a Post model with existing attributes
+var post = store.add('posts', { id: 42, body: 'Lorem ipsum' });
+// removes a Post model that has already been destroyed or should not be used
+store.remove(post);
+```
+
+Calling `#add` with new attributes for a model that already exists updates the
+existing model attributes instead of overwriting them:
+
+```javascript
+store.add('posts', { id: 42, body: 'Lorem ipsum' });
+store.add('posts', { id: 42, group: 'beta' });
+
+var post = store.get('posts', 42);
+post.get('body');  // returns 'Lorem ipsum'
+post.get('group'); // return 'beta'
+```
+
 ### Relating Records
 
 * There is no `belongsTo` relation. Only `hasOne` or `hasMany` currently.
