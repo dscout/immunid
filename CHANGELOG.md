@@ -8,6 +8,8 @@
   `Store`.
 * Breaking change: `Store.where` returns array of matching models instead of
   array of model ids.
+* `Store#add` updates existing models instead of overwriting them
+* Add `Store#remove` method to remove a model from the store without persistence
 
 ## v0.8.0 (2014-06-09)
 

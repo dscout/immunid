@@ -9,8 +9,8 @@ var Store     = require('../lib/Store');
 describe('Store', function() {
   describe('#build', function() {
     it('vivifies a new model but does not persist it', function() {
-      var store = new Store();
-      var model = store.build('tags', { name: 'alpha' });
+      var store = new Store(),
+          model = store.build('tags', { name: 'alpha' });
 
       expect(model.id).not.to.exist;
       expect(model.namespace).to.eq('tags');
@@ -21,8 +21,8 @@ describe('Store', function() {
 
   describe('#add', function() {
     it('stores the object within a particular namespace', function() {
-      var store  = new Store();
-      var result = store.add('tags', { id: 100 });
+      var store  = new Store(),
+          result = store.add('tags', { id: 100 });
 
       expect(store.get('tags', 100)).to.eql(result);
     });
@@ -47,20 +47,38 @@ describe('Store', function() {
         this.name = attributes.name;
       };
 
-      var store = new Store(null, { Tag: Tag });
-      var result = store.add('tags', { id: 100, name: 'gamma' });
+      var store  = new Store(null, { Tag: Tag }),
+          result = store.add('tags', { id: 100, name: 'gamma' });
 
       return store.find('tags', 100).then(function(tag) {
         expect(tag).to.be.an.instanceOf(Tag);
         expect(tag.name).to.eq('gamma');
       });
     });
+
+    it('updates an existing model', function() {
+      var store = new Store(null);
+
+      tag = store.add('tags', { id: 5, name: 'apple', group: 'alpha' });
+
+      sinon.spy(tag, 'set');
+
+      store.add('tags', { id: 5, name: 'banana' });
+
+      expect(tag.set).to.be.calledWith({ id: 5, name: 'banana' });
+      expect(tag.id).to.eq(5);
+      expect(tag.get('name')).to.eq('banana');
+      expect(tag.get('group')).to.eq('alpha');
+
+      tag.set.restore();
+    });
   });
 
   describe('#find', function() {
     it('retrieves a stored object', function() {
-      var store  = new Store();
-      var object = { id: 100 };
+      var store  = new Store(),
+          object = { id: 100 };
+
       store.add('tags', object);
 
       return store.find('tags', 100).then(function(tag) {
@@ -72,6 +90,7 @@ describe('Store', function() {
   describe('#all', function() {
     it('retrieves all objects stored within a namespace', function() {
       var store = new Store();
+
       store.add('tags', { id: 100 });
 
       expect(store.all('tags')).to.have.length(1);
@@ -92,9 +111,9 @@ describe('Store', function() {
 
   describe('#some', function() {
     it('retrieves each from a list of ids', function() {
-      var store   = new Store();
-      var objectA = { id: 100 };
-      var objectB = { id: 101 };
+      var store   = new Store(),
+          objectA = { id: 100 },
+          objectB = { id: 101 };
 
       store.add('tags', objectA);
       store.add('tags', objectB);
@@ -158,8 +177,8 @@ describe('Store', function() {
     });
 
     it('instructs the adapter to persist deletion', function() {
-      var store   = new Store();
-      var adapter = store.adapter;
+      var store   = new Store(),
+          adapter = store.adapter;
 
       sinon.spy(adapter, 'destroy');
 
@@ -167,16 +186,36 @@ describe('Store', function() {
       store.destroy({ namespace: 'tags', id: 100 });
 
       expect(adapter.destroy).to.be.called;
+
+      adapter.destroy.restore();
+    });
+  });
+
+  describe('#remove', function() {
+    it('removes the model from its bucket without persisting deletion', function() {
+      var store   = new Store(),
+          adapter = store.adapter,
+          tag;
+
+      sinon.spy(adapter, 'destroy');
+
+      tag = store.add('tags', { id: 100 });
+      store.remove(tag);
+
+      expect(store.get('tags', 100)).not.to.exist;
+      expect(adapter.destroy).not.to.be.called;
+
+      adapter.destroy.restore();
     });
   });
 
   describe('#reload', function() {
-    var server;
     var TagModel = Model.extend({
       path: function() {
         return '/tags/100'
       }
     });
+    var server;
 
     beforeEach(function() {
       server = sinon.fakeServer.create();
@@ -210,8 +249,8 @@ describe('Store', function() {
     });
 
     it('instructs the adapter to reload the model', function() {
-      var store   = new Store();
-      var adapter = store.adapter;
+      var store   = new Store(),
+          adapter = store.adapter;
 
       sinon.spy(adapter, 'read');
 
@@ -224,9 +263,9 @@ describe('Store', function() {
 
   describe('#save', function() {
     it('instructs the adapter to update the model', function() {
-      var store   = new Store();
-      var adapter = store.adapter;
-      var model   = store.build('tags', { id: 100 });
+      var store   = new Store(),
+          adapter = store.adapter,
+          model   = store.build('tags', { id: 100 });
 
       sinon.spy(adapter, 'update');
 
