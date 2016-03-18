@@ -10,6 +10,7 @@
   array of model ids.
 * `Store#add` updates existing models instead of overwriting them
 * Add `Store#remove` method to remove a model from the store without persistence
+* `Store#clear` properly removes a namespace from the store (useful for testing)
 
 ## v0.8.0 (2014-06-09)
 

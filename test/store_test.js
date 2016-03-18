@@ -105,6 +105,7 @@ describe('Store', function() {
       store.add('tags', { id: 101 });
       store.clear('tags');
 
+      expect(store.buckets.tags).not.to.exist;
       expect(store.all('tags')).to.be.empty;
     });
   });
