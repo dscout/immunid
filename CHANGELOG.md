@@ -10,6 +10,7 @@
   array of model ids.
 * `Store#add` updates existing models instead of overwriting them
 * Add `Store#remove` method to remove a model from the store without persistence
+* Fix: `Store#clear` properly removes a namespace from the store (useful for testing)
 
 ## v0.8.0 (2014-06-09)
 
@@ -51,7 +52,7 @@
 * FormView for convenient form handling and serialization.
 * Accept a template passed to the view in options.
 * Fix: Set root within the collection constructor.
-* FIx: Default collection set operations to parse.
+* Fix: Default collection set operations to parse.
 
 ## v0.5.3 (2014-01-08)
 
