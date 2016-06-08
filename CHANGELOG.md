@@ -1,16 +1,17 @@
-## Unreleased
+## v1.0.0 (2016-06-08)
 
-* Rename project from osteo.js to immunid.
-* Remove `Model` events in favor of emitting events from the `Store`.
-* Favor replacing `attributes` and `buckets` with new objects over mutating
+* Add: `Store#remove` method to remove a model from the store without persistence
+* Add: Export the events module for external use.
+* Change: Rename project from osteo.js to immunid.
+* Change: Favor replacing `attributes` and `buckets` with new objects over mutating
   them.
-* Clean up the public API exported by `Adapter`, `Model`, `Relation`, and
-  `Store`.
-* Breaking change: `Store.where` returns array of matching models instead of
+* Breaking Change: `Store.where` returns array of matching models instead of
   array of model ids.
-* `Store#add` updates existing models instead of overwriting them
-* Add `Store#remove` method to remove a model from the store without persistence
+* Change: `Store#add` updates existing models instead of overwriting them
+* Remove: `Model` events in favor of emitting events from the `Store`.
 * Fix: `Store#clear` properly removes a namespace from the store (useful for testing)
+* Fix: Clean up the public API exported by `Adapter`, `Model`, `Relation`, and
+  `Store`.
 
 ## v0.8.0 (2014-06-09)
 

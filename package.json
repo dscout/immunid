@@ -1,6 +1,6 @@
 {
   "name": "immunid",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "author": "dscout, inc",
   "description": "Opinionated data storage",
   "main": "immunid.js",
