@@ -23,6 +23,10 @@
     "es6-promise": "^2.0.0",
     "proquest": "^0.3.0"
   },
+  "bugs": {
+    "url": "https://github.com/dscout/immunid/issues"
+  },
+  "homepage": "https://github.com/dscout/immunid",
   "devDependencies": {
     "chai": "^1.9.1",
     "jshint": "^2.5.1",
