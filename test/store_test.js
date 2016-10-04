@@ -284,9 +284,9 @@ describe('Store', function() {
     });
 
     it('registers and listens for events', function() {
-      var callbackA = sinon.spy(),
-          callbackB = sinon.spy(),
-          callbackC = sinon.spy();
+      var callbackA = sinon.spy();
+      var callbackB = sinon.spy();
+      var callbackC = sinon.spy();
 
       store.on('foo:changed', callbackA, this);
       store.on('foo:changed', callbackB, this);
@@ -300,20 +300,28 @@ describe('Store', function() {
     });
 
     it('removes registered event listeners', function() {
-      var callbackA = sinon.spy(),
-          callbackB = sinon.spy();
+      var callbackA = sinon.spy();
+      var callbackB = sinon.spy();
+      var callbackC = sinon.spy();
 
       store.on('foo:changed', callbackA, this);
       store.on('foo:changed', callbackB, this);
+      store.on('foo:changed', callbackC);
       store.emit('foo:changed');
 
-      store.off('foo:changed', callbackA, this);
+      expect(callbackA).to.be.calledOnce;
+      expect(callbackB).to.be.calledOnce;
+      expect(callbackC).to.be.calledOnce;
+
+      store.off('foo:changed', callbackA);
+      store.off('foo:changed', callbackC);
       store.emit('foo:changed');
 
       expect(callbackA).to.be.calledOnce;
       expect(callbackB).to.be.calledTwice;
+      expect(callbackC).to.be.calledOnce;
 
-      store.off('foo:changed', null, null);
+      store.off('foo:changed');
       store.emit('foo:changed');
 
       expect(callbackB).to.be.calledTwice;
@@ -332,7 +340,7 @@ describe('Store', function() {
       store.emit('foo:changed');
       store.emit('foo:destroyed');
 
-      store.off('foo', null, null);
+      store.off('foo');
 
       store.emit('foo:created');
       store.emit('foo:changed');
@@ -353,7 +361,7 @@ describe('Store', function() {
       expect(fetchSpy).to.be.calledOnce;
       expect(fetchSpy).to.be.calledWithMatch(store.all('foobars'));
 
-      store.off('foobars:fetched', null, null);
+      store.off('foobars:fetched');
     });
 
     it('emits a `created` event under a namespace', function() {
@@ -366,7 +374,7 @@ describe('Store', function() {
       expect(createSpy).to.be.calledOnce;
       expect(createSpy).to.be.calledWithMatch(store.all('foobars'));
 
-      store.off('foobars:created', null, null);
+      store.off('foobars:created');
     });
 
     it('emits an `updated` event under a namespace', function() {
@@ -379,7 +387,7 @@ describe('Store', function() {
       expect(updateSpy).to.be.calledOnce;
       expect(updateSpy).to.be.calledWithMatch(store.all('foobars'));
 
-      store.off('foobars:updated', null, null);
+      store.off('foobars:updated');
     });
 
     it('emits a `reloaded` event under a namespace', function() {
@@ -392,7 +400,7 @@ describe('Store', function() {
       expect(reloadSpy).to.be.calledOnce;
       expect(reloadSpy).to.be.calledWithMatch(store.all('foobars'));
 
-      store.off('foobars:reloaded', null, null);
+      store.off('foobars:reloaded');
     });
 
     it('emits a `destroyed` event under a namespace', function() {
@@ -405,7 +413,7 @@ describe('Store', function() {
         expect(destroySpy).to.be.calledOnce;
         expect(destroySpy).to.be.calledWithMatch(foobar);
 
-        store.off('foobars:destroyed', null, null);
+        store.off('foobars:destroyed');
       });
     });
   });
