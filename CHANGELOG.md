@@ -1,3 +1,8 @@
+## v1.0.1 (2016-10-04)
+
+* Fix: `Events.off` no longer requires a `context` argument. This changes the
+  API of `off`, but does so to fix a bug with both `off/1` and `off/2`.
+
 ## v1.0.0 (2016-06-08)
 
 * Add: `Store#remove` method to remove a model from the store without persistence
