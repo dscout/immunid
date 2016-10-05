@@ -114,6 +114,16 @@ post.get('body');  // returns 'Lorem ipsum'
 post.get('group'); // return 'beta'
 ```
 
+During testing or in certain production situations you may want clear all, or
+part of the store. For that, there is `clear`:
+
+```javascript
+store.clear('posts'); // all models in the posts namespace
+store.clear(); // all models in all namespaces
+```
+
+Clearing is only a local operation and doesn't make any external requests.
+
 ### Relating Records
 
 * There is no `belongsTo` relation. Only `hasOne` or `hasMany` currently.

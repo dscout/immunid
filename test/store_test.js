@@ -108,6 +108,18 @@ describe('Store', function() {
       expect(store.buckets.tags).not.to.exist;
       expect(store.all('tags')).to.be.empty;
     });
+
+    it('removes all models in all namespaces without an argument', function() {
+      var store = new Store();
+
+      store.add('tags', { id: 100 });
+      store.add('rags', { id: 101 });
+
+      store.clear();
+
+      expect(store.buckets.rags).not.to.exist;
+      expect(store.buckets.tags).not.to.exist;
+    });
   });
 
   describe('#some', function() {
