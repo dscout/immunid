@@ -76,8 +76,8 @@ describe('Store', function() {
 
   describe('#find', function() {
     it('retrieves a stored object', function() {
-      var store  = new Store(),
-          object = { id: 100 };
+      var store  = new Store();
+      var object = { id: 100 };
 
       store.add('tags', object);
 
@@ -90,7 +90,6 @@ describe('Store', function() {
   describe('#all', function() {
     it('retrieves all objects stored within a namespace', function() {
       var store = new Store();
-
       store.add('tags', { id: 100 });
 
       expect(store.all('tags')).to.have.length(1);
@@ -124,14 +123,19 @@ describe('Store', function() {
 
   describe('#some', function() {
     it('retrieves each from a list of ids', function() {
-      var store   = new Store(),
-          objectA = { id: 100 },
-          objectB = { id: 101 };
-
-      store.add('tags', objectA);
-      store.add('tags', objectB);
+      var store = new Store();
+      store.add('tags', { id: 100 });
+      store.add('tags', { id: 101 });
 
       expect(store.some('tags', [100, 101])).to.have.length(2);
+    });
+
+    it('does not retrieve undefined items', function() {
+      var store = new Store();
+      store.add('tags', { id: 100 });
+      store.add('tags', { id: 102 });
+
+      expect(store.some('tags', [100, 101])).to.have.length(1);
     });
   });
 
