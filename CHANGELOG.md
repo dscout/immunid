@@ -1,3 +1,7 @@
+## v1.0.2 (2016-10-17)
+
+* Fix: Compact the array returned by `Store#some`
+
 ## v1.0.1 (2016-10-04)
 
 * Fix: `Events.off` no longer requires a `context` argument. This changes the
