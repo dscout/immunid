@@ -20,21 +20,25 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "es6-promise": "^2.0.0",
-    "proquest": "^0.3.0"
+    "es6-promise": "^4.2.4",
+    "proquest": "^0.4.0"
   },
   "bugs": {
     "url": "https://github.com/dscout/immunid/issues"
   },
   "homepage": "https://github.com/dscout/immunid",
   "devDependencies": {
-    "chai": "^1.9.1",
+    "browserify": "^16.2.2",
+    "chai": "^4.0.0",
     "jshint": "^2.5.1",
-    "karma": "^0.12.24",
-    "karma-browserify": "^1.0.0",
-    "karma-chai-sinon": "^0.1.4",
-    "karma-firefox-launcher": "^0.1.3",
-    "karma-mocha": "^0.1.9",
-    "sinon": "^1.12.2"
+    "karma": "^2.0.0",
+    "karma-browserify": "^5.3.0",
+    "karma-chai-sinon": "^0.1.5",
+    "karma-firefox-launcher": "^1.1.0",
+    "karma-mocha": "^1.3.0",
+    "mocha": "^5.2.0",
+    "sinon": "^4.1.6",
+    "sinon-chai": "^3.2.0",
+    "watchify": "^3.11.0"
   }
 }
