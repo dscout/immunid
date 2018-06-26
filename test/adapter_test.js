@@ -47,6 +47,25 @@ describe('Adapter', function() {
     });
   });
 
+  it('catches failed requests with provided catcher', function(done) {
+    server.respondWith('GET', '/comments/1', [
+      401, { 'Content-Type': 'application/json' }, ''
+    ]);
+
+    var catcher = sinon.spy();
+    var adapter = new Adapter({ catcher });
+
+    adapter
+      .read({ path: function() { return '/comments/1' } })
+      .catch(function(response) {
+        expect(catcher).to.be.calledOnce;
+
+        done();
+      });
+
+    server.respond();
+  })
+
   describe('#read', function() {
     it('peforms a GET request with object URL', function(done) {
       server.respondWith('GET', '/comments/1', [
