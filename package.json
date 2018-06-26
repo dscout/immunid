@@ -20,8 +20,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "es6-promise": "^2.0.0",
-    "proquest": "^0.3.0"
+    "es6-promise": "^4.2.4",
+    "proquest": "^0.4.0"
   },
   "bugs": {
     "url": "https://github.com/dscout/immunid/issues"
