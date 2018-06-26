@@ -35,9 +35,7 @@ describe('Adapter', function() {
 
       adapter.read({ path: function() { return '/comments' } });
 
-      expect(request.requestHeaders).to.eql({
-        'Accept': 'application/json'
-      });
+      expect(request.requestHeaders.Accept).to.eq('application/json');
     });
 
     it('prepends the host to the path', function() {
