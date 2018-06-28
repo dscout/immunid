@@ -1,3 +1,10 @@
+# v1.1.0 (2018-06-28)
+
+* Add: `catcher` option to `Adapter` constructor to configure handler for
+  rejected request promises
+* Change: Bump `proquest` and `es6-promise` dependencies
+* Fix: Missing test dependencies and CircleCI config
+
 ## v1.0.2 (2016-10-17)
 
 * Fix: Compact the array returned by `Store#some`
